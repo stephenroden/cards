@@ -1,0 +1,28 @@
+<section class="results">
+  <h2>Round {{ displayRound() }} Results</h2>
+  @if (gameStatus().isOver) {
+    <p>Game over. Winner: {{ winnerNames()[0] }}</p>
+  } @else if (thresholdReached()) {
+    <p>Tie for lowest score. Continue playing until one player is lowest.</p>
+  }
+  <div class="scoreboard">
+    <div class="scoreboard-head">
+      <span>Player</span>
+      <span class="num">Round</span>
+      <span class="num">Total</span>
+    </div>
+    @for (player of playersByScore(); track player.id) {
+      <div class="score-row">
+        <span class="player-name">{{ player.name }}</span>
+        <span class="player-round num">{{ roundPoints()[player.id] }}</span>
+        <span class="player-total num">{{ player.score }}</span>
+      </div>
+    }
+  </div>
+  <div class="actions">
+    @if (!gameStatus().isOver) {
+      <button class="primary" type="button" (click)="startNextRound()">Play Next Round</button>
+    }
+    <button class="ghost" type="button" (click)="startNewGame()">Start New Game</button>
+  </div>
+</section>

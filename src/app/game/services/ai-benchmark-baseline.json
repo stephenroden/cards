@@ -1,0 +1,17 @@
+{
+  "handsPerTable": 120,
+  "standard": {
+    "smart": { "max_avg_points": 7.81, "min_win_rate_pct": 20.03, "max_q_taken_pct": 28.39, "min_q_safe_dump_pct": 68.86 },
+    "card-shark": { "max_avg_points": 6.37, "min_win_rate_pct": 26.91, "max_q_taken_pct": 24.17, "min_q_safe_dump_pct": 77.27 },
+    "endgame-defensive": { "max_avg_points": 5.69, "min_win_rate_pct": 28.0, "max_q_taken_pct": 22.24, "min_q_safe_dump_pct": 81.13 },
+    "spade-pressure": { "max_avg_points": 6.58, "min_win_rate_pct": 26.74, "max_q_taken_pct": 26.25, "min_q_safe_dump_pct": 76.0 },
+    "anti-moon-sentinel": { "max_avg_points": 6.05, "min_win_rate_pct": 23.32, "max_q_taken_pct": 23.96, "min_q_safe_dump_pct": 79.19 }
+  },
+  "jackVariant": {
+    "smart": { "max_avg_points": 7.79, "min_win_rate_pct": 20.49, "max_q_taken_pct": 28.70, "min_q_safe_dump_pct": 69.09 },
+    "card-shark": { "max_avg_points": 6.29, "min_win_rate_pct": 26.58, "max_q_taken_pct": 23.49, "min_q_safe_dump_pct": 78.72 },
+    "endgame-defensive": { "max_avg_points": 5.83, "min_win_rate_pct": 27.11, "max_q_taken_pct": 22.66, "min_q_safe_dump_pct": 80.57 },
+    "spade-pressure": { "max_avg_points": 6.64, "min_win_rate_pct": 27.21, "max_q_taken_pct": 26.61, "min_q_safe_dump_pct": 75.79 },
+    "anti-moon-sentinel": { "max_avg_points": 5.95, "min_win_rate_pct": 23.60, "max_q_taken_pct": 23.54, "min_q_safe_dump_pct": 79.62 }
+  }
+}

@@ -1,0 +1,28 @@
+<section class="home">
+  <div class="home-card">
+    <h2>Hearts</h2>
+    <p>Single-player with three computer opponents.</p>
+    <label class="rule-toggle">
+      <input
+        type="checkbox"
+        [checked]="jackOfDiamondsMinus10()"
+        (change)="setJackOfDiamondsMinus10($any($event.target).checked)"
+      />
+      <span>Enable J♦ = -10 variant</span>
+    </label>
+    <p class="rule-help">When enabled, taking the Jack of Diamonds subtracts 10 points.</p>
+    <label class="rule-toggle">
+      <input
+        type="checkbox"
+        [checked]="debugAiHistory()"
+        (change)="setDebugAiHistory($any($event.target).checked)"
+      />
+      <span>Enable AI debug history</span>
+    </label>
+    <p class="rule-help">Shows per-CPU play-by-play reasons during the round. Default on.</p>
+    <div class="home-actions">
+      <a class="primary" routerLink="/game" (click)="startGame()">Start Game</a>
+      <a class="ghost" routerLink="/rules">Rules</a>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,26 @@
+:root {
+  color-scheme: only light;
+  font-family: "Trebuchet MS", "Gill Sans", "Segoe UI", sans-serif;
+  background: radial-gradient(circle at top, #2a6c45 0%, #17422a 45%, #0e2418 100%);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100svh;
+  min-height: 100dvh;
+  background: transparent;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+a {
+  touch-action: manipulation;
+}

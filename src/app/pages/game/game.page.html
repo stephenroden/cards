@@ -1,0 +1,208 @@
+<section class="table">
+  <div class="table-ring top">
+    @if (playerForSeat('north'); as player) {
+      <div class="top-panel">
+        <div class="top-row">
+          <h1 class="table-title">Cards</h1>
+          <div
+            class="player-chip top-player-chip"
+            [class.trick-leader]="isTrickLeader(player.id)"
+            [class.pass-target]="isPassTarget(player.id)"
+            [class.pass-source]="isPassSource(player.id)"
+          >
+            <span class="player-avatar" aria-hidden="true">🦈</span>
+            <span class="player-name">{{ player.name }}</span>
+            <span class="player-score combined">{{ player.score }} ({{ roundPoints()[player.id] }})</span>
+          </div>
+          <nav class="table-actions">
+            @if (state().rules.debugAiHistory) {
+              <button type="button" class="ghost-action" (click)="toggleDebugPanel()">
+                {{ debugPanelOpen() ? 'Hide Why' : 'Why' }}
+              </button>
+            }
+            <a routerLink="/results">Results</a>
+            <a routerLink="/">Exit</a>
+          </nav>
+        </div>
+      </div>
+    }
+  </div>
+  <div class="table-ring left">
+    @if (playerForSeat('west'); as player) {
+      <div
+        class="player-chip"
+        [class.trick-leader]="isTrickLeader(player.id)"
+        [class.pass-target]="isPassTarget(player.id)"
+        [class.pass-source]="isPassSource(player.id)"
+      >
+        <span class="player-avatar" aria-hidden="true">🧠</span>
+        <span class="player-name">{{ player.name }}</span>
+        <span class="player-score combined">{{ player.score }} ({{ roundPoints()[player.id] }})</span>
+      </div>
+    }
+  </div>
+  <div class="table-ring right">
+    @if (playerForSeat('east'); as player) {
+      <div
+        class="player-chip"
+        [class.trick-leader]="isTrickLeader(player.id)"
+        [class.pass-target]="isPassTarget(player.id)"
+        [class.pass-source]="isPassSource(player.id)"
+      >
+        <span class="player-avatar" aria-hidden="true">🎯</span>
+        <span class="player-name">{{ player.name }}</span>
+        <span class="player-score combined">{{ player.score }} ({{ roundPoints()[player.id] }})</span>
+      </div>
+    }
+  </div>
+
+  <div class="table-center">
+    <div class="trick">
+      <div
+        class="trick-cards"
+        [class.taking]="state().trickTaking"
+        [class.take-north]="trickWinnerSeat() === 'north'"
+        [class.take-south]="trickWinnerSeat() === 'south'"
+        [class.take-east]="trickWinnerSeat() === 'east'"
+        [class.take-west]="trickWinnerSeat() === 'west'"
+      >
+        @for (play of state().trick.cards; track play.playerId) {
+          <div
+            class="trick-card"
+            [class.seat-north]="seatFor(play.playerId) === 'north'"
+            [class.seat-south]="seatFor(play.playerId) === 'south'"
+            [class.seat-east]="seatFor(play.playerId) === 'east'"
+            [class.seat-west]="seatFor(play.playerId) === 'west'"
+          >
+            <div class="trick-card-face">
+              <img class="card-face-image" [src]="cardImage(play.card)" [alt]="play.card.rank + ' of ' + play.card.suit" />
+            </div>
+          </div>
+        }
+      </div>
+      @if (state().trickTaking && state().trickWinnerId) {
+        <div class="trick-winner-label">{{ playerName(state().trickWinnerId!) }} won the trick</div>
+      }
+      @if (state().phase === 'pass') {
+        <button
+          type="button"
+          class="pass-button"
+          [class.pass-left]="state().passDirection === 'left'"
+          [class.pass-right]="state().passDirection === 'right'"
+          [class.pass-across]="state().passDirection === 'across'"
+          (click)="isNoPassRound() || isPassing() ? continuePass() : submitPass()"
+          [disabled]="isNoPassRound() ? !isPassComplete() : (isPassing() ? !isPassComplete() : selectedPassCards().length !== 3)"
+        >
+          @if (isNoPassRound()) {
+            <span class="pass-text">Proceed</span>
+          } @else if (isPassing()) {
+            <span class="pass-text">Continue</span>
+          } @else {
+            <span class="pass-text">Pass</span>
+            <span class="pass-arrow" aria-hidden="true">{{ passDirectionArrow() }}</span>
+            <span class="pass-target">{{ passDirectionLabel() }}</span>
+          }
+        </button>
+      }
+    </div>
+  </div>
+
+  <div class="table-ring bottom">
+    @if (playerForSeat('south'); as player) {
+      <div
+        class="player-chip south-score-chip"
+        [class.trick-leader]="isTrickLeader(player.id)"
+        [class.pass-target]="isPassTarget(player.id)"
+        [class.pass-source]="isPassSource(player.id)"
+      >
+        <span class="player-score combined">{{ player.score }} ({{ roundPoints()[player.id] }})</span>
+      </div>
+    }
+    <div class="hand">
+      @if (state().phase === 'pass') {
+        @if (isNoPassRound()) {
+          @if (humanHand().length === 0) {
+            <div class="hand-empty">Dealing cards…</div>
+          } @else {
+            @for (card of humanHand(); track $index) {
+              <button
+                type="button"
+                class="card"
+                [class.disabled]="true"
+                [disabled]="true"
+                [style.--offset]="handOffset($index, humanHand().length)"
+                [style.--total]="humanHand().length"
+              >
+                <img class="card-face-image" [src]="cardImage(card)" [alt]="card.rank + ' of ' + card.suit" />
+              </button>
+            }
+          }
+        } @else if (displayedHand().length === 0) {
+          <div class="hand-empty">Dealing cards…</div>
+        } @else {
+          @for (card of displayedHand(); track $index) {
+            <button
+              type="button"
+              class="card"
+              [class.selected]="isSelected(card)"
+              [class.passing]="isPassing() && isSelected(card)"
+              [class.received]="isReceived(card)"
+              (click)="togglePassCard(card)"
+              [style.--offset]="handOffset($index, displayedHand().length)"
+              [style.--total]="displayedHand().length"
+            >
+              <img class="card-face-image" [src]="cardImage(card)" [alt]="card.rank + ' of ' + card.suit" />
+            </button>
+          }
+        }
+      } @else {
+        @if (humanHand().length === 0) {
+          <div class="hand-empty">Waiting…</div>
+        } @else {
+          @for (card of humanHand(); track $index) {
+            <button
+              type="button"
+              class="card"
+              (click)="playCard(card)"
+              [class.disabled]="!isCardPlayable(card)"
+              [disabled]="!isCardPlayable(card)"
+              [class.received]="isReceived(card)"
+              [style.--offset]="handOffset($index, humanHand().length)"
+              [style.--total]="humanHand().length"
+            >
+              <img class="card-face-image" [src]="cardImage(card)" [alt]="card.rank + ' of ' + card.suit" />
+            </button>
+          }
+        }
+      }
+    </div>
+  </div>
+  @if (state().rules.debugAiHistory && debugPanelOpen()) {
+    <section class="ai-debug-overlay">
+      <header>
+        <span>Round Debug Log</span>
+        <button type="button" class="ai-debug-close" (click)="closeDebugPanel()">Close</button>
+      </header>
+      <div #debugLog class="ai-debug-log">
+        @for (entry of debugEntries(); track entry.index) {
+          @if (entry.type === 'system') {
+            <p class="ai-log-line system-line">#{{ entry.index }} [info] {{ entry.trace.summary }}</p>
+          } @else {
+            <p class="ai-log-line">
+              #{{ entry.index }}
+              <span class="ai-player" [class]="debugPlayerClass(entry.playerId)">{{ entry.playerName }}</span>
+              played {{ entry.cardLabel }} · {{ reasonLabel(entry.trace.reasonCode) }}
+              @if (entry.cardLabel === 'Q♠') {
+                · {{ qSpadeContext(entry.trace) }}
+              } @else if (entry.cardLabel === 'J♦') {
+                · {{ jDiamondContext(entry.trace) }}
+              } @else if (genericContext(entry.trace)) {
+                · {{ genericContext(entry.trace) }}
+              }
+            </p>
+          }
+        }
+      </div>
+    </section>
+  }
+</section>
