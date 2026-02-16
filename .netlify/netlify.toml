@@ -12,7 +12,7 @@ package = "@netlify/angular-runtime"
 [plugins.inputs]
 
 [build]
-publish = "/Users/stephen/git/timeline/cards/dist/cards/browser"
+publish = "/Users/stephen/vibes/cards/dist/cards/browser"
 publishOrigin = "config"
 commandOrigin = "config"
 command = "npm run build"
