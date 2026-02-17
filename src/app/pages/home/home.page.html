@@ -4,18 +4,20 @@
     <p>Single-player with three computer opponents.</p>
     <label class="rule-toggle">
       <input
+        #jackToggle
         type="checkbox"
         [checked]="jackOfDiamondsMinus10()"
-        (change)="setJackOfDiamondsMinus10($any($event.target).checked)"
+        (change)="setJackOfDiamondsMinus10(jackToggle.checked)"
       />
       <span>Enable J♦ = -10 variant</span>
     </label>
     <p class="rule-help">When enabled, taking the Jack of Diamonds subtracts 10 points.</p>
     <label class="rule-toggle">
       <input
+        #debugToggle
         type="checkbox"
         [checked]="debugAiHistory()"
-        (change)="setDebugAiHistory($any($event.target).checked)"
+        (change)="setDebugAiHistory(debugToggle.checked)"
       />
       <span>Enable AI debug history</span>
     </label>

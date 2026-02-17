@@ -3,7 +3,7 @@ import { AiDecisionTrace, Card, GameState, Player } from '../game.models';
 import { AiService } from './ai.service';
 import { GameStateService } from './game-state.service';
 import { RulesService } from './rules.service';
-import { MOON_POINTS, penaltyScoreCard, scoreCard } from './scoring';
+import { applyRoundScores, scoreCard } from './scoring';
 
 const PASS_COUNT = 3;
 
@@ -324,28 +324,7 @@ export class GameEngineService {
   }
 
   private scoreRound(state: GameState): GameState {
-    const totals = state.players.reduce<Record<string, number>>((acc, player) => {
-      acc[player.id] = (state.takenCards[player.id] ?? []).reduce(
-        (points, card) => points + scoreCard(card, state.rules),
-        0
-      );
-      return acc;
-    }, {});
-
-    const penaltyTotals = state.players.reduce<Record<string, number>>((acc, player) => {
-      acc[player.id] = (state.takenCards[player.id] ?? []).reduce((points, card) => points + penaltyScoreCard(card), 0);
-      return acc;
-    }, {});
-
-    const moonShooter = Object.entries(penaltyTotals).find(([, points]) => points === MOON_POINTS);
-    const players = state.players.map((player) => {
-      const roundPoints = totals[player.id] ?? 0;
-      const jdAdjustment = roundPoints - (penaltyTotals[player.id] ?? 0);
-      const finalPoints = moonShooter
-        ? (player.id === moonShooter[0] ? 0 : MOON_POINTS) + jdAdjustment
-        : roundPoints;
-      return { ...player, score: player.score + finalPoints };
-    });
+    const players = applyRoundScores(state.players, state.takenCards, state.rules);
 
     return {
       ...state,

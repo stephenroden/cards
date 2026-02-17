@@ -1,6 +1,5 @@
 import { DEFAULT_GAME_RULES, type Card, type GameState, type Player } from '../game.models';
-import { GameEngineService } from './game-engine.service';
-import { scoreCard } from './scoring';
+import { applyRoundScores, scoreCard } from './scoring';
 
 const card = (suit: Card['suit'], rank: Card['rank']): Card => ({ suit, rank });
 
@@ -47,7 +46,6 @@ describe('scoring rule variants', () => {
   });
 
   it('applies J♦ adjustment in moon rounds (always-on rule)', () => {
-    const service = { scoreRound: (GameEngineService.prototype as any).scoreRound };
     const state = baseState({
       rules: { jackOfDiamondsMinus10: true, debugAiHistory: true },
       players: [player('p1', 0), player('p2', 0), player('p3', 0), player('p4', 0)],
@@ -74,11 +72,11 @@ describe('scoring rule variants', () => {
       }
     });
 
-    const next = service.scoreRound.call({}, state) as GameState;
-    const p1 = next.players.find((p) => p.id === 'p1');
-    const p2 = next.players.find((p) => p.id === 'p2');
-    const p3 = next.players.find((p) => p.id === 'p3');
-    const p4 = next.players.find((p) => p.id === 'p4');
+    const scoredPlayers = applyRoundScores(state.players, state.takenCards, state.rules);
+    const p1 = scoredPlayers.find((p) => p.id === 'p1');
+    const p2 = scoredPlayers.find((p) => p.id === 'p2');
+    const p3 = scoredPlayers.find((p) => p.id === 'p3');
+    const p4 = scoredPlayers.find((p) => p.id === 'p4');
 
     expect(p1?.score).toBe(0);
     expect(p2?.score).toBe(16);

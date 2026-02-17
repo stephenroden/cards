@@ -43,17 +43,24 @@ export class App implements OnInit, OnDestroy {
 
   private updateClientState(): void {
     this.isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
-    this.isMobile = window.matchMedia('(max-width: 900px) and (pointer: coarse)').matches;
+    this.isMobile = this.matchesMedia('(max-width: 900px) and (pointer: coarse)');
     this.isInstalled = this.isRunningInstalled();
     this.canPromptInstall = Boolean(this.deferredInstallPrompt) && !this.isInstalled;
   }
 
   private isRunningInstalled(): boolean {
-    const standaloneDisplayMode = window.matchMedia('(display-mode: standalone)').matches;
+    const standaloneDisplayMode = this.matchesMedia('(display-mode: standalone)');
     const navigatorWithStandalone = navigator as Navigator & { standalone?: boolean };
     const iosStandalone = Boolean(navigatorWithStandalone.standalone);
 
     return standaloneDisplayMode || iosStandalone;
+  }
+
+  private matchesMedia(query: string): boolean {
+    if (typeof window.matchMedia !== 'function') {
+      return false;
+    }
+    return window.matchMedia(query).matches;
   }
 
   async promptInstall(): Promise<void> {

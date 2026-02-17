@@ -103,7 +103,7 @@ export class GamePageComponent {
   private readonly rankIndex = new Map(this.rankOrder.map((rank, index) => [rank, index]));
 
   constructor() {
-    effect(() => {
+    effect((onCleanup) => {
       const state = this.state();
       if (this.state().phase === 'deal') {
         this.gameEngine.startRound();
@@ -120,12 +120,13 @@ export class GamePageComponent {
         this.selectedPassCards.set([]);
       }
       this.debugEntries().length;
-      setTimeout(() => {
+      const scrollTimer = setTimeout(() => {
         const container = this.debugLogRef?.nativeElement;
         if (container && this.debugPanelOpen()) {
           container.scrollTop = container.scrollHeight;
         }
       }, 0);
+      onCleanup(() => clearTimeout(scrollTimer));
     });
   }
 
@@ -236,16 +237,23 @@ export class GamePageComponent {
   }
 
   debugPlayerClass(playerId: string): string {
-    if (playerId === 'p1') {
+    const player = this.state().players.find((current) => current.id === playerId);
+    if (!player) {
+      return 'player-other';
+    }
+
+    if (player.type === 'human') {
       return 'player-you';
     }
-    if (playerId === 'p2') {
+
+    const seat = this.seatFor(playerId);
+    if (seat === 'west') {
       return 'player-p2';
     }
-    if (playerId === 'p3') {
+    if (seat === 'north') {
       return 'player-p3';
     }
-    if (playerId === 'p4') {
+    if (seat === 'east') {
       return 'player-p4';
     }
     return 'player-other';
