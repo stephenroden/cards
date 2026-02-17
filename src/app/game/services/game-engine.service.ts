@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AiDecisionTrace, Card, GameState, Player } from '../game.models';
 import { AiService } from './ai.service';
+import { applyPasses, getPassDirection, nextTurnPlayerId, sameCard, suitGlyph } from './game-engine.utils';
 import { GameStateService } from './game-state.service';
 import { RulesService } from './rules.service';
 import { applyRoundScores, scoreCard } from './scoring';
@@ -208,7 +209,7 @@ export class GameEngineService {
 
     const brokeHeartsNow = !state.heartsBroken && card.suit === 'hearts';
     const heartsBroken = state.heartsBroken || brokeHeartsNow;
-    const nextTurn = this.nextTurnPlayerId(state, player.id);
+    const nextTurn = nextTurnPlayerId(state.players, player.id, state.turnPlayerId);
     let nextState: GameState = {
       ...state,
       players: updatedPlayers,
@@ -334,15 +335,6 @@ export class GameEngineService {
     };
   }
 
-  private nextTurnPlayerId(state: GameState, currentId: string): string {
-    const ids = state.players.map((player) => player.id);
-    const index = ids.indexOf(currentId);
-    if (index === -1) {
-      return state.turnPlayerId;
-    }
-    return ids[(index + 1) % ids.length];
-  }
-
   private recordDebugPlay(state: GameState, player: Player, card: Card, trace: AiDecisionTrace): void {
     if (!state.rules.debugAiHistory) {
       return;
@@ -352,73 +344,3 @@ export class GameEngineService {
     });
   }
 }
-
-const getPassDirection = (round: number): GameState['passDirection'] => {
-  const cycle = (round - 1) % 4;
-  if (cycle === 0) {
-    return 'left';
-  }
-  if (cycle === 1) {
-    return 'right';
-  }
-  if (cycle === 2) {
-    return 'across';
-  }
-  return 'none';
-};
-
-const applyPasses = (
-  players: Player[],
-  selections: Record<string, Card[]>,
-  direction: GameState['passDirection']
-): { players: Player[]; transfers: GameState['passTransfers'] } => {
-  if (direction === 'none') {
-    return { players, transfers: [] };
-  }
-
-  const ids = players.map((player) => player.id);
-  const nextIndex = (index: number): number => {
-    if (direction === 'left') {
-      return (index + 1) % ids.length;
-    }
-    if (direction === 'right') {
-      return (index - 1 + ids.length) % ids.length;
-    }
-    return (index + 2) % ids.length;
-  };
-
-  const received: Record<string, Card[]> = {};
-  const transfers: GameState['passTransfers'] = [];
-  players.forEach((player, index) => {
-    const targetId = ids[nextIndex(index)];
-    const cards = selections[player.id] ?? [];
-    received[targetId] = [...(received[targetId] ?? []), ...cards];
-    transfers.push({ fromId: player.id, toId: targetId, cards });
-  });
-
-  const updatedPlayers = players.map((player) => {
-    const removed = selections[player.id] ?? [];
-    const remaining = player.hand.filter((card) => !removed.some((pass) => sameCard(pass, card)));
-    return {
-      ...player,
-      hand: [...remaining, ...(received[player.id] ?? [])]
-    };
-  });
-
-  return { players: updatedPlayers, transfers };
-};
-
-const sameCard = (a: Card, b: Card): boolean => a.suit === b.suit && a.rank === b.rank;
-
-const suitGlyph = (suit: Card['suit']): string => {
-  if (suit === 'clubs') {
-    return '♣';
-  }
-  if (suit === 'diamonds') {
-    return '♦';
-  }
-  if (suit === 'hearts') {
-    return '♥';
-  }
-  return '♠';
-};
