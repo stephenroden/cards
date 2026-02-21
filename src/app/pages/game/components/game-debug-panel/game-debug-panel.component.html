@@ -1,0 +1,26 @@
+<section class="ai-debug-overlay">
+  <header>
+    <span>Round Debug Log</span>
+    <button type="button" class="ai-debug-close" (click)="emitClose()">Close</button>
+  </header>
+  <div #debugLog class="ai-debug-log">
+    @for (entry of entries; track entry.index) {
+      @if (entry.type === 'system') {
+        <p class="ai-log-line system-line">#{{ entry.index }} [info] {{ entry.trace.summary }}</p>
+      } @else {
+        <p class="ai-log-line">
+          #{{ entry.index }}
+          <span class="ai-player" [class]="entry.playerClass">{{ entry.playerName }}</span>
+          played {{ entry.cardLabel }} · {{ reasonLabel(entry.trace.reasonCode) }}
+          @if (entry.cardLabel === 'Q♠') {
+            · {{ qSpadeContext(entry.trace) }}
+          } @else if (entry.cardLabel === 'J♦') {
+            · {{ jDiamondContext(entry.trace) }}
+          } @else if (genericContext(entry.trace)) {
+            · {{ genericContext(entry.trace) }}
+          }
+        </p>
+      }
+    }
+  </div>
+</section>

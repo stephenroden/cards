@@ -1,6 +1,6 @@
 import { AiDecisionTrace, Card } from '../../game/game.models';
 
-export type TraceLike = Pick<AiDecisionTrace, 'factors'>;
+export type TraceLike = Pick<AiDecisionTrace, 'factors' | 'reasonCode' | 'summary'>;
 
 export const reasonLabel = (reasonCode: string): string => {
   if (reasonCode === 'capture_bonus_jd') {
@@ -116,3 +116,88 @@ export const findNewCards = (previous: Card[], current: Card[]): Card[] => {
   }
   return added;
 };
+
+type Seat = 'south' | 'west' | 'north' | 'east';
+
+const seatOrder: Seat[] = ['south', 'west', 'north', 'east'];
+const suitOrder: Card['suit'][] = ['clubs', 'diamonds', 'spades', 'hearts'];
+const rankOrder: Card['rank'][] = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+const suitIndex = new Map(suitOrder.map((suit, index) => [suit, index]));
+const rankIndex = new Map(rankOrder.map((rank, index) => [rank, index]));
+
+export const seatForPlayer = (
+  players: Array<{ id: string; type: 'human' | 'cpu' }>,
+  playerId?: string
+): Seat | null => {
+  if (!playerId) {
+    return null;
+  }
+  const humanIndex = players.findIndex((player) => player.type === 'human');
+  const playerIndex = players.findIndex((player) => player.id === playerId);
+  if (humanIndex === -1 || playerIndex === -1) {
+    return null;
+  }
+  const offset = (playerIndex - humanIndex + players.length) % players.length;
+  return seatOrder[offset] ?? null;
+};
+
+export const playerForSeat = <TPlayer extends { type: 'human' | 'cpu' }>(players: TPlayer[], seat: Seat): TPlayer | undefined => {
+  const humanIndex = players.findIndex((player) => player.type === 'human');
+  if (humanIndex === -1) {
+    return undefined;
+  }
+  const offset = seatOrder.indexOf(seat);
+  if (offset === -1) {
+    return undefined;
+  }
+  return players[(humanIndex + offset) % players.length];
+};
+
+export const passTargetPlayerId = (
+  players: Array<{ id: string; type: 'human' | 'cpu' }>,
+  direction: 'left' | 'right' | 'across' | 'none'
+): string | null => {
+  if (direction === 'none') {
+    return null;
+  }
+  const humanIndex = players.findIndex((player) => player.type === 'human');
+  if (humanIndex === -1) {
+    return null;
+  }
+  if (direction === 'left') {
+    return players[(humanIndex + 1) % players.length]?.id ?? null;
+  }
+  if (direction === 'right') {
+    return players[(humanIndex - 1 + players.length) % players.length]?.id ?? null;
+  }
+  return players[(humanIndex + 2) % players.length]?.id ?? null;
+};
+
+export const passSourcePlayerId = (
+  players: Array<{ id: string; type: 'human' | 'cpu' }>,
+  direction: 'left' | 'right' | 'across' | 'none'
+): string | null => {
+  if (direction === 'none') {
+    return null;
+  }
+  const humanIndex = players.findIndex((player) => player.type === 'human');
+  if (humanIndex === -1) {
+    return null;
+  }
+  if (direction === 'left') {
+    return players[(humanIndex - 1 + players.length) % players.length]?.id ?? null;
+  }
+  if (direction === 'right') {
+    return players[(humanIndex + 1) % players.length]?.id ?? null;
+  }
+  return players[(humanIndex + 2) % players.length]?.id ?? null;
+};
+
+export const sortCards = (cards: Card[]): Card[] =>
+  [...cards].sort((left, right) => {
+    const suitDelta = (suitIndex.get(left.suit) ?? 0) - (suitIndex.get(right.suit) ?? 0);
+    if (suitDelta !== 0) {
+      return suitDelta;
+    }
+    return (rankIndex.get(left.rank) ?? 0) - (rankIndex.get(right.rank) ?? 0);
+  });

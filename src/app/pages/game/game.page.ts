@@ -1,25 +1,27 @@
-import { Component, ElementRef, ViewChild, computed, effect, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { Card, Player, Rank, Suit } from '../../game/game.models';
+import { Card, Player } from '../../game/game.models';
 import { GameEngineService } from '../../game/services/game-engine.service';
 import { GameStateService } from '../../game/services/game-state.service';
 import { RulesService } from '../../game/services/rules.service';
 import { scoreCard } from '../../game/services/scoring';
+import { GameDebugEntry, GameDebugPanelComponent } from './components/game-debug-panel/game-debug-panel.component';
+import { GamePlayerChipComponent } from './components/game-player-chip/game-player-chip.component';
 import {
   cardImage as getCardImage,
   findNewCards,
-  genericContext as getGenericContext,
-  jDiamondContext as getJDiamondContext,
-  qSpadeContext as getQSpadeContext,
-  reasonLabel as getReasonLabel,
-  suitSymbol as getSuitSymbol,
-  TraceLike
+  passSourcePlayerId,
+  passTargetPlayerId,
+  playerForSeat as resolvePlayerForSeat,
+  seatForPlayer,
+  sortCards,
+  suitSymbol as getSuitSymbol
 } from './game-page.utils';
 
 @Component({
   selector: 'app-game-page',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, GameDebugPanelComponent, GamePlayerChipComponent],
   templateUrl: './game.page.html',
   styleUrl: './game.page.css',
   host: {
@@ -27,7 +29,6 @@ import {
   }
 })
 export class GamePageComponent {
-  @ViewChild('debugLog') private debugLogRef?: ElementRef<HTMLDivElement>;
   private readonly gameEngine = inject(GameEngineService);
   private readonly gameState = inject(GameStateService);
   private readonly rules = inject(RulesService);
@@ -41,7 +42,7 @@ export class GamePageComponent {
   readonly hidePassedCards = signal(false);
   readonly debugPanelOpen = signal(false);
   readonly humanPlayer = computed(() => this.state().players.find((player) => player.type === 'human'));
-  readonly humanHand = computed(() => this.sortCards(this.humanPlayer()?.hand ?? []));
+  readonly humanHand = computed(() => sortCards(this.humanPlayer()?.hand ?? []));
   readonly displayedHand = computed(() => {
     const hand = this.humanHand();
     if (this.state().phase !== 'pass' || !this.hidePassedCards()) {
@@ -69,7 +70,7 @@ export class GamePageComponent {
     if (!player || player.type !== 'human') {
       return [];
     }
-    return this.sortCards(this.rules.getLegalPlays(this.state(), player));
+    return sortCards(this.rules.getLegalPlays(this.state(), player));
   });
   readonly passDirectionArrow = computed(() => {
     switch (this.state().passDirection) {
@@ -97,24 +98,19 @@ export class GamePageComponent {
   });
   readonly isNoPassRound = computed(() => this.state().phase === 'pass' && this.state().passDirection === 'none');
   readonly trickWinnerSeat = computed(() => this.seatFor(this.state().trickWinnerId));
-  readonly debugEntries = computed(() =>
+  readonly debugEntries = computed<GameDebugEntry[]>(() =>
     this.state().debugRoundHistory.map((entry, index) => ({
       index: index + 1,
       type: entry.type ?? 'play',
-      playerId: entry.playerId,
       playerName: this.playerName(entry.playerId),
+      playerClass: this.debugPlayerClass(entry.playerId),
       cardLabel: `${entry.card.rank}${this.suitSymbol(entry.card.suit)}`,
       trace: entry.trace
     }))
   );
-  private readonly suitOrder: Suit[] = ['clubs', 'diamonds', 'spades', 'hearts'];
-  private readonly rankOrder: Rank[] = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
-  private readonly suitIndex = new Map(this.suitOrder.map((suit, index) => [suit, index]));
-  private readonly rankIndex = new Map(this.rankOrder.map((rank, index) => [rank, index]));
 
   constructor() {
-    effect((onCleanup) => {
-      const state = this.state();
+    effect(() => {
       if (this.state().phase === 'deal') {
         this.gameEngine.startRound();
       }
@@ -129,14 +125,6 @@ export class GamePageComponent {
       if (this.state().phase !== 'pass') {
         this.selectedPassCards.set([]);
       }
-      this.debugEntries().length;
-      const scrollTimer = setTimeout(() => {
-        const container = this.debugLogRef?.nativeElement;
-        if (container && this.debugPanelOpen()) {
-          container.scrollTop = container.scrollHeight;
-        }
-      }, 0);
-      onCleanup(() => clearTimeout(scrollTimer));
     });
   }
 
@@ -198,18 +186,7 @@ export class GamePageComponent {
   }
 
   seatFor(playerId?: string): 'south' | 'west' | 'north' | 'east' | null {
-    if (!playerId) {
-      return null;
-    }
-    const players = this.state().players;
-    const humanIndex = players.findIndex((player) => player.type === 'human');
-    const playerIndex = players.findIndex((player) => player.id === playerId);
-    if (humanIndex === -1 || playerIndex === -1) {
-      return null;
-    }
-    const order: Array<'south' | 'west' | 'north' | 'east'> = ['south', 'west', 'north', 'east'];
-    const offset = (playerIndex - humanIndex + players.length) % players.length;
-    return order[offset] ?? null;
+    return seatForPlayer(this.state().players, playerId);
   }
 
   playerName(playerId: string): string {
@@ -217,17 +194,7 @@ export class GamePageComponent {
   }
 
   playerForSeat(seat: 'south' | 'west' | 'north' | 'east'): Player | undefined {
-    const players = this.state().players;
-    const humanIndex = players.findIndex((player) => player.type === 'human');
-    if (humanIndex === -1) {
-      return undefined;
-    }
-    const order: Array<'south' | 'west' | 'north' | 'east'> = ['south', 'west', 'north', 'east'];
-    const offset = order.indexOf(seat);
-    if (offset === -1) {
-      return undefined;
-    }
-    return players[(humanIndex + offset) % players.length];
+    return resolvePlayerForSeat(this.state().players, seat);
   }
 
   isTrickLeader(playerId: string): boolean {
@@ -235,11 +202,19 @@ export class GamePageComponent {
   }
 
   isPassTarget(playerId: string): boolean {
-    return this.state().phase === 'pass' && !this.isPassComplete() && this.passTargetPlayerId() === playerId;
+    return (
+      this.state().phase === 'pass' &&
+      !this.isPassComplete() &&
+      passTargetPlayerId(this.state().players, this.state().passDirection) === playerId
+    );
   }
 
   isPassSource(playerId: string): boolean {
-    return this.state().phase === 'pass' && this.isPassComplete() && this.passSourcePlayerId() === playerId;
+    return (
+      this.state().phase === 'pass' &&
+      this.isPassComplete() &&
+      passSourcePlayerId(this.state().players, this.state().passDirection) === playerId
+    );
   }
 
   factorEntries(trace: { factors: Record<string, string | number | boolean> }): Array<{ key: string; value: string | number | boolean }> {
@@ -267,72 +242,6 @@ export class GamePageComponent {
       return 'player-p4';
     }
     return 'player-other';
-  }
-
-  reasonLabel(reasonCode: string): string {
-    return getReasonLabel(reasonCode);
-  }
-
-  qSpadeContext(trace: TraceLike): string {
-    return getQSpadeContext(trace);
-  }
-
-  jDiamondContext(trace: TraceLike): string {
-    return getJDiamondContext(trace);
-  }
-
-  genericContext(trace: TraceLike): string {
-    return getGenericContext(trace);
-  }
-
-  private passTargetPlayerId(): string | null {
-    const direction = this.state().passDirection;
-    if (direction === 'none') {
-      return null;
-    }
-    const players = this.state().players;
-    const humanIndex = players.findIndex((player) => player.type === 'human');
-    if (humanIndex === -1) {
-      return null;
-    }
-
-    if (direction === 'left') {
-      return players[(humanIndex + 1) % players.length]?.id ?? null;
-    }
-    if (direction === 'right') {
-      return players[(humanIndex - 1 + players.length) % players.length]?.id ?? null;
-    }
-    return players[(humanIndex + 2) % players.length]?.id ?? null;
-  }
-
-  private passSourcePlayerId(): string | null {
-    const direction = this.state().passDirection;
-    if (direction === 'none') {
-      return null;
-    }
-    const players = this.state().players;
-    const humanIndex = players.findIndex((player) => player.type === 'human');
-    if (humanIndex === -1) {
-      return null;
-    }
-
-    if (direction === 'left') {
-      return players[(humanIndex - 1 + players.length) % players.length]?.id ?? null;
-    }
-    if (direction === 'right') {
-      return players[(humanIndex + 1) % players.length]?.id ?? null;
-    }
-    return players[(humanIndex + 2) % players.length]?.id ?? null;
-  }
-
-  private sortCards(cards: Card[]): Card[] {
-    return [...cards].sort((left, right) => {
-      const suitDelta = (this.suitIndex.get(left.suit) ?? 0) - (this.suitIndex.get(right.suit) ?? 0);
-      if (suitDelta !== 0) {
-        return suitDelta;
-      }
-      return (this.rankIndex.get(left.rank) ?? 0) - (this.rankIndex.get(right.rank) ?? 0);
-    });
   }
 
   submitPass(): void {

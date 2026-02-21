@@ -1,6 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { GameStateService } from '../../game/services/game-state.service';
+import { ThemeService } from '../../theme.service';
 
 const JACK_OF_DIAMONDS_KEY = 'hearts.rules.jack_of_diamonds_minus_10';
 const DEBUG_AI_HISTORY_KEY = 'hearts.rules.debug_ai_history';
@@ -14,8 +15,11 @@ const DEBUG_AI_HISTORY_KEY = 'hearts.rules.debug_ai_history';
 })
 export class HomePageComponent {
   private readonly gameState = inject(GameStateService);
+  private readonly themeService = inject(ThemeService);
   readonly jackOfDiamondsMinus10 = signal(false);
   readonly debugAiHistory = signal(true);
+  readonly themes = this.themeService.options;
+  readonly selectedTheme = this.themeService.theme;
 
   constructor() {
     const saved = globalThis.localStorage?.getItem(JACK_OF_DIAMONDS_KEY);
@@ -41,5 +45,13 @@ export class HomePageComponent {
 
   setDebugAiHistory(enabled: boolean): void {
     this.debugAiHistory.set(enabled);
+  }
+
+  setTheme(themeId: string): void {
+    const selected = this.themes.find((theme) => theme.id === themeId);
+    if (!selected) {
+      return;
+    }
+    this.themeService.setTheme(selected.id);
   }
 }

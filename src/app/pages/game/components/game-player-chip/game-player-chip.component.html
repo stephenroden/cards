@@ -1,0 +1,15 @@
+<div
+  class="player-chip"
+  [class]="'player-chip ' + extraClass"
+  [class.trick-leader]="isTrickLeader"
+  [class.pass-target]="isPassTarget"
+  [class.pass-source]="isPassSource"
+>
+  @if (showAvatar) {
+    <span class="player-avatar" aria-hidden="true">{{ avatar }}</span>
+  }
+  @if (showName) {
+    <span class="player-name">{{ player.name }}</span>
+  }
+  <span class="player-score combined">{{ player.score }} ({{ roundPoints }})</span>
+</div>

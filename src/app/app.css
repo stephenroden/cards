@@ -2,7 +2,7 @@
   display: block;
   min-height: 100svh;
   min-height: 100dvh;
-  color: #f7f2e7;
+  color: var(--text-primary);
 }
 
 .app-shell {
@@ -51,8 +51,8 @@
   padding: 0.7rem 1.1rem;
   font: inherit;
   font-weight: 700;
-  color: #08122a;
-  background: #f7f2e7;
+  color: var(--accent-on-primary);
+  background: var(--accent-primary);
   cursor: pointer;
 }
 
@@ -74,6 +74,6 @@
     font-size: 1.2rem;
     line-height: 1.4;
     font-weight: 600;
-    color: #f7f2e7;
+    color: var(--text-primary);
   }
 }

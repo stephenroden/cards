@@ -1,18 +1,23 @@
 .results {
-  min-height: 100dvh;
+  height: 100dvh;
   display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
   gap: 16px;
-  align-content: start;
+  align-content: stretch;
   padding: 20px;
+  padding-bottom: max(20px, env(safe-area-inset-bottom));
+  overflow: hidden;
 }
 
 .scoreboard {
   display: grid;
   gap: 8px;
-  background: rgba(14, 36, 24, 0.5);
+  background: var(--surface-soft);
   border-radius: 16px;
   padding: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid var(--border-soft);
+  min-height: 0;
+  overflow: auto;
 }
 
 .scoreboard-head,
@@ -56,6 +61,7 @@
   gap: 12px;
   justify-content: center;
   align-items: center;
+  padding-bottom: max(4px, env(safe-area-inset-bottom));
 }
 
 .primary {
@@ -64,8 +70,8 @@
   justify-content: center;
   height: 44px;
   border-radius: 12px;
-  background: #f0c35a;
-  color: #1c1200;
+  background: var(--accent-primary);
+  color: var(--accent-on-primary);
   font-weight: 600;
   border: none;
   padding: 0 18px;
@@ -79,8 +85,8 @@
   height: 44px;
   border-radius: 12px;
   background: transparent;
-  color: #f6e9cc;
-  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: var(--text-primary);
+  border: 1px solid var(--border-soft);
   padding: 0 18px;
   cursor: pointer;
 }

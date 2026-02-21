@@ -1,7 +1,6 @@
 <section class="home">
   <div class="home-card">
     <h2>Hearts</h2>
-    <p>Single-player with three computer opponents.</p>
     <label class="rule-toggle">
       <input
         #jackToggle
@@ -22,6 +21,14 @@
       <span>Enable AI debug history</span>
     </label>
     <p class="rule-help">Shows per-CPU play-by-play reasons during the round. Default on.</p>
+    <label class="rule-toggle theme-toggle">
+      <span>Color scheme</span>
+      <select #themeSelect (change)="setTheme(themeSelect.value)">
+        @for (theme of themes; track theme.id) {
+          <option [value]="theme.id" [selected]="theme.id === selectedTheme()">{{ theme.label }}</option>
+        }
+      </select>
+    </label>
     <div class="home-actions">
       <a class="primary" routerLink="/game" (click)="startGame()">Start Game</a>
       <a class="ghost" routerLink="/rules">Rules</a>

@@ -1,5 +1,6 @@
-import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit, inject, isDevMode } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { ThemeService } from './theme.service';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -13,6 +14,7 @@ interface BeforeInstallPromptEvent extends Event {
   styleUrl: './app.css'
 })
 export class App implements OnInit, OnDestroy {
+  private readonly themeService = inject(ThemeService);
   isMobile = false;
   isInstalled = false;
   isIos = false;
@@ -20,6 +22,7 @@ export class App implements OnInit, OnDestroy {
   private deferredInstallPrompt: BeforeInstallPromptEvent | null = null;
 
   ngOnInit(): void {
+    this.themeService.initialize();
     this.updateClientState();
     window.addEventListener('beforeinstallprompt', this.onBeforeInstallPrompt);
     window.addEventListener('appinstalled', this.onAppInstalled);
@@ -31,7 +34,7 @@ export class App implements OnInit, OnDestroy {
   }
 
   get showInstallGate(): boolean {
-    return this.isMobile && !this.isInstalled;
+    return !isDevMode() && this.isMobile && !this.isInstalled;
   }
 
   @HostListener('window:resize')

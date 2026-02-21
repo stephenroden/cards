@@ -1,7 +1,92 @@
 :root {
   color-scheme: only light;
   font-family: "Trebuchet MS", "Gill Sans", "Segoe UI", sans-serif;
-  background: radial-gradient(circle at top, #2a6c45 0%, #17422a 45%, #0e2418 100%);
+  --app-bg: radial-gradient(circle at top, #2a6c45 0%, #17422a 45%, #0e2418 100%);
+  --text-primary: #f7f2e7;
+  --text-muted: rgba(255, 255, 255, 0.75);
+  --surface-soft: rgba(14, 36, 24, 0.6);
+  --surface-strong: rgba(14, 36, 24, 0.82);
+  --border-soft: rgba(255, 255, 255, 0.28);
+  --accent-primary: #f0c35a;
+  --accent-on-primary: #1c1200;
+  background: var(--app-bg);
+}
+
+:root[data-theme='ocean'] {
+  --app-bg: radial-gradient(circle at top, #2c6f8f 0%, #1b3f64 45%, #13263e 100%);
+  --text-primary: #eef7ff;
+  --text-muted: rgba(238, 247, 255, 0.78);
+  --surface-soft: rgba(15, 39, 60, 0.62);
+  --surface-strong: rgba(15, 39, 60, 0.84);
+  --border-soft: rgba(175, 220, 255, 0.32);
+  --accent-primary: #79d4ff;
+  --accent-on-primary: #08223a;
+}
+
+:root[data-theme='sunset'] {
+  --app-bg: radial-gradient(circle at top, #8f5d33 0%, #5f3a25 45%, #2f1a14 100%);
+  --text-primary: #fff3e8;
+  --text-muted: rgba(255, 243, 232, 0.78);
+  --surface-soft: rgba(62, 35, 23, 0.62);
+  --surface-strong: rgba(62, 35, 23, 0.84);
+  --border-soft: rgba(255, 212, 168, 0.35);
+  --accent-primary: #ffb36a;
+  --accent-on-primary: #361500;
+}
+
+:root[data-theme='ember'] {
+  --app-bg: radial-gradient(circle at top, #7f2d2d 0%, #4c1b1b 45%, #241112 100%);
+  --text-primary: #fff1ef;
+  --text-muted: rgba(255, 241, 239, 0.78);
+  --surface-soft: rgba(50, 20, 21, 0.62);
+  --surface-strong: rgba(50, 20, 21, 0.86);
+  --border-soft: rgba(255, 188, 188, 0.34);
+  --accent-primary: #ff8f84;
+  --accent-on-primary: #3a0807;
+}
+
+:root[data-theme='forest-night'] {
+  --app-bg: radial-gradient(circle at top, #1f5e45 0%, #153f34 45%, #0b2721 100%);
+  --text-primary: #edfdf6;
+  --text-muted: rgba(237, 253, 246, 0.78);
+  --surface-soft: rgba(10, 30, 24, 0.65);
+  --surface-strong: rgba(10, 30, 24, 0.88);
+  --border-soft: rgba(175, 241, 214, 0.35);
+  --accent-primary: #7ee5b7;
+  --accent-on-primary: #042619;
+}
+
+:root[data-theme='slate'] {
+  --app-bg: radial-gradient(circle at top, #4a5967 0%, #2f3d4a 45%, #1d2631 100%);
+  --text-primary: #f1f6fb;
+  --text-muted: rgba(241, 246, 251, 0.78);
+  --surface-soft: rgba(20, 30, 40, 0.64);
+  --surface-strong: rgba(20, 30, 40, 0.86);
+  --border-soft: rgba(202, 217, 232, 0.34);
+  --accent-primary: #9dc4ea;
+  --accent-on-primary: #11263d;
+}
+
+:root[data-theme='neon'] {
+  --app-bg: radial-gradient(circle at top, #2b3f14 0%, #1e2c12 45%, #10180b 100%);
+  --text-primary: #f8ffe6;
+  --text-muted: rgba(248, 255, 230, 0.82);
+  --surface-soft: rgba(23, 38, 11, 0.68);
+  --surface-strong: rgba(23, 38, 11, 0.9);
+  --border-soft: rgba(210, 255, 122, 0.42);
+  --accent-primary: #c8ff42;
+  --accent-on-primary: #1f3000;
+}
+
+:root[data-theme='high-contrast'] {
+  --app-bg: radial-gradient(circle at top, #000000 0%, #000000 55%, #050505 100%);
+  --text-primary: #ffffff;
+  --text-muted: #f1f1f1;
+  --surface-soft: rgba(0, 0, 0, 0.92);
+  --surface-strong: rgba(0, 0, 0, 0.98);
+  --border-soft: rgba(255, 255, 255, 0.95);
+  --accent-primary: #ffe600;
+  --accent-on-primary: #000000;
 }
 
 * {

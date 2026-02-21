@@ -1,0 +1,75 @@
+.ai-debug-overlay {
+  position: absolute;
+  inset: 12px;
+  z-index: 15;
+  background: rgba(12, 27, 20, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 16px;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  overflow: hidden;
+}
+
+.ai-debug-overlay header {
+  padding: 10px 12px;
+  font-size: 13px;
+  font-weight: 700;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ai-debug-close {
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.08);
+  color: inherit;
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.ai-debug-log {
+  overflow: auto;
+  display: block;
+  padding: 10px 12px 14px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.ai-log-line {
+  margin: 0 0 4px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.system-line {
+  color: #9fd6ff;
+}
+
+.ai-player {
+  font-weight: 700;
+}
+
+.ai-player.player-you {
+  color: #f0c35a;
+}
+
+.ai-player.player-p2 {
+  color: #7ec7ff;
+}
+
+.ai-player.player-p3 {
+  color: #8ee9b4;
+}
+
+.ai-player.player-p4 {
+  color: #f8b3d1;
+}
+
+.ai-player.player-other {
+  color: #ffffff;
+}

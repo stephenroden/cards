@@ -4,16 +4,15 @@
       <div class="top-panel">
         <div class="top-row">
           <h1 class="table-title">Cards</h1>
-          <div
-            class="player-chip top-player-chip"
-            [class.trick-leader]="isTrickLeader(player.id)"
-            [class.pass-target]="isPassTarget(player.id)"
-            [class.pass-source]="isPassSource(player.id)"
-          >
-            <span class="player-avatar" aria-hidden="true">🦈</span>
-            <span class="player-name">{{ player.name }}</span>
-            <span class="player-score combined">{{ player.score }} ({{ roundPoints()[player.id] }})</span>
-          </div>
+          <app-game-player-chip
+            [player]="player"
+            [roundPoints]="roundPoints()[player.id]"
+            [avatar]="'🦈'"
+            [extraClass]="'top-player-chip'"
+            [isTrickLeader]="isTrickLeader(player.id)"
+            [isPassTarget]="isPassTarget(player.id)"
+            [isPassSource]="isPassSource(player.id)"
+          />
           <nav class="table-actions">
             @if (state().rules.debugAiHistory) {
               <button type="button" class="ghost-action" (click)="toggleDebugPanel()">
@@ -29,30 +28,26 @@
   </div>
   <div class="table-ring left">
     @if (playerForSeat('west'); as player) {
-      <div
-        class="player-chip"
-        [class.trick-leader]="isTrickLeader(player.id)"
-        [class.pass-target]="isPassTarget(player.id)"
-        [class.pass-source]="isPassSource(player.id)"
-      >
-        <span class="player-avatar" aria-hidden="true">🧠</span>
-        <span class="player-name">{{ player.name }}</span>
-        <span class="player-score combined">{{ player.score }} ({{ roundPoints()[player.id] }})</span>
-      </div>
+      <app-game-player-chip
+        [player]="player"
+        [roundPoints]="roundPoints()[player.id]"
+        [avatar]="'🧠'"
+        [isTrickLeader]="isTrickLeader(player.id)"
+        [isPassTarget]="isPassTarget(player.id)"
+        [isPassSource]="isPassSource(player.id)"
+      />
     }
   </div>
   <div class="table-ring right">
     @if (playerForSeat('east'); as player) {
-      <div
-        class="player-chip"
-        [class.trick-leader]="isTrickLeader(player.id)"
-        [class.pass-target]="isPassTarget(player.id)"
-        [class.pass-source]="isPassSource(player.id)"
-      >
-        <span class="player-avatar" aria-hidden="true">🎯</span>
-        <span class="player-name">{{ player.name }}</span>
-        <span class="player-score combined">{{ player.score }} ({{ roundPoints()[player.id] }})</span>
-      </div>
+      <app-game-player-chip
+        [player]="player"
+        [roundPoints]="roundPoints()[player.id]"
+        [avatar]="'🎯'"
+        [isTrickLeader]="isTrickLeader(player.id)"
+        [isPassTarget]="isPassTarget(player.id)"
+        [isPassSource]="isPassSource(player.id)"
+      />
     }
   </div>
 
@@ -109,14 +104,16 @@
 
   <div class="table-ring bottom">
     @if (playerForSeat('south'); as player) {
-      <div
-        class="player-chip south-score-chip"
-        [class.trick-leader]="isTrickLeader(player.id)"
-        [class.pass-target]="isPassTarget(player.id)"
-        [class.pass-source]="isPassSource(player.id)"
-      >
-        <span class="player-score combined">{{ player.score }} ({{ roundPoints()[player.id] }})</span>
-      </div>
+      <app-game-player-chip
+        [player]="player"
+        [roundPoints]="roundPoints()[player.id]"
+        [showAvatar]="false"
+        [showName]="false"
+        [extraClass]="'south-score-chip'"
+        [isTrickLeader]="isTrickLeader(player.id)"
+        [isPassTarget]="isPassTarget(player.id)"
+        [isPassSource]="isPassSource(player.id)"
+      />
     }
     <div class="hand">
       @if (state().phase === 'pass') {
@@ -178,31 +175,6 @@
     </div>
   </div>
   @if (state().rules.debugAiHistory && debugPanelOpen()) {
-    <section class="ai-debug-overlay">
-      <header>
-        <span>Round Debug Log</span>
-        <button type="button" class="ai-debug-close" (click)="closeDebugPanel()">Close</button>
-      </header>
-      <div #debugLog class="ai-debug-log">
-        @for (entry of debugEntries(); track entry.index) {
-          @if (entry.type === 'system') {
-            <p class="ai-log-line system-line">#{{ entry.index }} [info] {{ entry.trace.summary }}</p>
-          } @else {
-            <p class="ai-log-line">
-              #{{ entry.index }}
-              <span class="ai-player" [class]="debugPlayerClass(entry.playerId)">{{ entry.playerName }}</span>
-              played {{ entry.cardLabel }} · {{ reasonLabel(entry.trace.reasonCode) }}
-              @if (entry.cardLabel === 'Q♠') {
-                · {{ qSpadeContext(entry.trace) }}
-              } @else if (entry.cardLabel === 'J♦') {
-                · {{ jDiamondContext(entry.trace) }}
-              } @else if (genericContext(entry.trace)) {
-                · {{ genericContext(entry.trace) }}
-              }
-            </p>
-          }
-        }
-      </div>
-    </section>
+    <app-game-debug-panel [entries]="debugEntries()" (close)="closeDebugPanel()" />
   }
 </section>

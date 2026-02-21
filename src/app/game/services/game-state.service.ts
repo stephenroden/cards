@@ -1,14 +1,43 @@
 import { Injectable, signal } from '@angular/core';
 import { Card, DEFAULT_GAME_RULES, GameRules, GameState, Player, RANKS, SUITS } from '../game.models';
 
+type CpuSkillLevel = 'Easy' | 'Medium' | 'Hard';
+
+interface CpuBotTemplate {
+  name: string;
+  aiProfileId: string;
+  level: CpuSkillLevel;
+}
+
+const CPU_BOT_POOL: CpuBotTemplate[] = [
+  { name: 'Rookie Ron', aiProfileId: 'dumb', level: 'Easy' },
+  { name: 'Cautious Cam', aiProfileId: 'smart', level: 'Easy' },
+  { name: 'Shark Finn', aiProfileId: 'card-shark', level: 'Medium' },
+  { name: 'Pressure Pat', aiProfileId: 'spade-pressure', level: 'Medium' },
+  { name: 'Closer Quinn', aiProfileId: 'endgame-defensive', level: 'Hard' },
+  { name: 'Sentinel Nova', aiProfileId: 'anti-moon-sentinel', level: 'Hard' }
+];
+
+const randomCpuPlayers = (): Player[] => {
+  const selection = shuffle(CPU_BOT_POOL).slice(0, 3);
+  return selection.map((selected, index) => {
+    return {
+      id: `p${index + 2}`,
+      name: selected.name,
+      type: 'cpu',
+      aiProfileId: selected.aiProfileId,
+      hand: [],
+      score: 0
+    };
+  });
+};
+
 const initialState = (rulesOverride?: Partial<GameRules>): GameState => ({
   phase: 'deal',
   rules: { ...DEFAULT_GAME_RULES, ...(rulesOverride ?? {}) },
   players: [
     { id: 'p1', name: 'You', type: 'human', hand: [], score: 0 },
-    { id: 'p2', name: 'Spade Pressure', type: 'cpu', aiProfileId: 'spade-pressure', hand: [], score: 0 },
-    { id: 'p3', name: 'Sentinel', type: 'cpu', aiProfileId: 'anti-moon-sentinel', hand: [], score: 0 },
-    { id: 'p4', name: 'Endgame', type: 'cpu', aiProfileId: 'endgame-defensive', hand: [], score: 0 }
+    ...randomCpuPlayers()
   ],
   trick: { leaderId: 'p1', cards: [] },
   trickWinnerId: undefined,
@@ -98,8 +127,8 @@ export class GameStateService {
   }
 }
 
-const shuffle = (cards: Card[]): Card[] => {
-  const copy = cards.slice();
+const shuffle = <T>(items: T[]): T[] => {
+  const copy = items.slice();
   for (let index = copy.length - 1; index > 0; index -= 1) {
     const swapIndex = Math.floor(Math.random() * (index + 1));
     [copy[index], copy[swapIndex]] = [copy[swapIndex], copy[index]];

@@ -14,7 +14,7 @@
   height: 100%;
   min-height: 0;
   border-radius: 28px;
-  background: radial-gradient(circle at 30% 30%, #2d7a4e 0%, #1c4f33 55%, #143323 100%);
+  background: var(--app-bg);
   border: 2px solid rgba(255, 255, 255, 0.2);
   display: grid;
   grid-template-columns: 1fr auto 1fr;
@@ -43,9 +43,9 @@
   align-items: center;
   justify-content: center;
   padding: 8px 12px;
-  border-radius: 999px;
-  background: rgba(14, 36, 24, 0.65);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 0;
+  background: transparent;
+  border: 0;
   font-size: 12px;
   position: relative;
   z-index: 2;
@@ -54,7 +54,6 @@
 .table-ring.top {
   grid-column: 1 / -1;
   grid-row: 1;
-  border-radius: 18px;
   justify-content: stretch;
   padding: 8px 12px;
 }
@@ -63,12 +62,14 @@
   grid-column: 1;
   grid-row: 2;
   justify-self: start;
+  min-width: clamp(140px, 18vw, 190px);
 }
 
 .table-ring.right {
   grid-column: 3;
   grid-row: 2;
   justify-self: end;
+  min-width: clamp(140px, 18vw, 190px);
 }
 
 .table-ring.bottom {
@@ -83,41 +84,6 @@
   height: 100%;
   position: relative;
   padding-top: 40px;
-}
-
-.player-chip {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-  border-radius: 12px;
-  padding: 4px 8px;
-  text-align: center;
-}
-
-.player-chip.trick-leader {
-  border: 1px solid rgba(240, 195, 90, 0.95);
-  box-shadow:
-    0 0 0 1px rgba(240, 195, 90, 0.45) inset,
-    0 0 14px rgba(240, 195, 90, 0.35);
-  background: rgba(77, 59, 18, 0.32);
-}
-
-.player-chip.pass-target {
-  border: 1px solid rgba(126, 186, 255, 0.95);
-  box-shadow:
-    0 0 0 1px rgba(126, 186, 255, 0.45) inset,
-    0 0 14px rgba(126, 186, 255, 0.35);
-  background: rgba(20, 48, 84, 0.34);
-}
-
-.player-chip.pass-source {
-  border: 1px solid rgba(134, 219, 170, 0.95);
-  box-shadow:
-    0 0 0 1px rgba(134, 219, 170, 0.45) inset,
-    0 0 14px rgba(134, 219, 170, 0.35);
-  background: rgba(19, 68, 47, 0.34);
 }
 
 .top-panel {
@@ -141,23 +107,6 @@
   justify-self: start;
 }
 
-.top-player-chip {
-  justify-self: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-}
-
-.top-player-chip .player-name {
-  grid-column: auto;
-}
-
-.top-player-chip .player-score {
-  font-size: 12px;
-  opacity: 0.9;
-}
-
 .table-actions {
   display: flex;
   gap: 8px;
@@ -168,8 +117,8 @@
 .table-actions .ghost-action {
   padding: 7px 14px;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  background: rgba(14, 36, 24, 0.6);
+  border: 1px solid var(--border-soft);
+  background: var(--surface-soft);
   font-size: 13px;
   font-weight: 600;
   color: inherit;
@@ -177,45 +126,6 @@
 
 .table-actions .ghost-action {
   cursor: pointer;
-}
-
-.player-name {
-  font-weight: 600;
-}
-
-.player-avatar {
-  width: 26px;
-  height: 26px;
-  display: grid;
-  place-items: center;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.16);
-  border: 1px solid rgba(255, 255, 255, 0.28);
-  font-size: 15px;
-  line-height: 1;
-}
-
-.player-score {
-  font-size: 11px;
-  opacity: 0.8;
-}
-
-.player-score.total {
-  justify-self: end;
-}
-
-.player-score.combined {
-  font-size: 13px;
-  font-weight: 600;
-  opacity: 0.9;
-}
-
-.south-score-chip {
-  position: absolute;
-  top: 8px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 3;
 }
 
 .table-center {
@@ -245,90 +155,20 @@
 }
 
 .trick-winner-label {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(6px, 2.2dvh, 14px);
+  transform: translateX(-50%);
+  z-index: 4;
+  pointer-events: none;
   font-size: 11px;
   line-height: 1.2;
   opacity: 0.85;
-  margin-top: 2px;
   padding: 2px 8px;
   border-radius: 999px;
   background: rgba(14, 36, 24, 0.55);
   border: 1px solid rgba(255, 255, 255, 0.15);
-}
-
-.ai-debug-overlay {
-  position: absolute;
-  inset: 12px;
-  z-index: 15;
-  background: rgba(12, 27, 20, 0.92);
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  border-radius: 16px;
-  display: grid;
-  grid-template-rows: auto 1fr;
-  overflow: hidden;
-}
-
-.ai-debug-overlay header {
-  padding: 10px 12px;
-  font-size: 13px;
-  font-weight: 700;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.ai-debug-close {
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  background: rgba(255, 255, 255, 0.08);
-  color: inherit;
-  border-radius: 999px;
-  padding: 3px 10px;
-  font-size: 11px;
-  cursor: pointer;
-}
-
-.ai-debug-log {
-  overflow: auto;
-  display: block;
-  padding: 10px 12px 14px;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  font-size: 12px;
-  line-height: 1.45;
-}
-
-.ai-log-line {
-  margin: 0 0 4px;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.system-line {
-  color: #9fd6ff;
-}
-
-.ai-player {
-  font-weight: 700;
-}
-
-.ai-player.player-you {
-  color: #f0c35a;
-}
-
-.ai-player.player-p2 {
-  color: #7ec7ff;
-}
-
-.ai-player.player-p3 {
-  color: #8ee9b4;
-}
-
-.ai-player.player-p4 {
-  color: #f8b3d1;
-}
-
-.ai-player.player-other {
-  color: #ffffff;
 }
 
 .trick-title {
@@ -486,8 +326,8 @@
 }
 
 .pass-button {
-  border: 1px solid rgba(255, 255, 255, 0.45);
-  background: rgba(14, 36, 24, 0.82);
+  border: 1px solid var(--border-soft);
+  background: var(--surface-strong);
   color: inherit;
   border-radius: 999px;
   padding: 12px 20px;
