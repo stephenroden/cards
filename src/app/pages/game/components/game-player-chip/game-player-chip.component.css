@@ -88,3 +88,10 @@
 .south-score-chip .player-score.combined {
   opacity: 1;
 }
+
+@media (max-width: 900px) {
+  .south-score-chip {
+    top: 0;
+    bottom: auto;
+  }
+}

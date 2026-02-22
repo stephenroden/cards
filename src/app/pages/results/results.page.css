@@ -90,3 +90,26 @@
   padding: 0 18px;
   cursor: pointer;
 }
+
+@media (max-width: 420px) {
+  .results {
+    gap: 12px;
+    padding: 12px;
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+  }
+
+  .scoreboard {
+    padding: 12px;
+    overflow-x: hidden;
+  }
+
+  .scoreboard-head,
+  .score-row {
+    grid-template-columns: minmax(0, 1fr) minmax(52px, auto) minmax(52px, auto);
+    gap: 6px 8px;
+  }
+
+  .scoreboard-head {
+    font-size: 11px;
+  }
+}

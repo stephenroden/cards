@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import { Component, ElementRef, HostListener, computed, effect, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { Card, Player } from '../../game/game.models';
 import { GameEngineService } from '../../game/services/game-engine.service';
@@ -33,6 +33,7 @@ export class GamePageComponent {
   private readonly gameState = inject(GameStateService);
   private readonly rules = inject(RulesService);
   private readonly router = inject(Router);
+  private readonly hostRef = inject<ElementRef<HTMLElement>>(ElementRef);
 
   readonly state = this.gameState.state;
   readonly selectedPassCards = signal<Card[]>([]);
@@ -145,6 +146,25 @@ export class GamePageComponent {
 
   closeDebugPanel(): void {
     this.debugPanelOpen.set(false);
+  }
+
+  closeActionMenus(): void {
+    const menus = this.hostRef.nativeElement.querySelectorAll<HTMLDetailsElement>('details.table-actions-menu[open]');
+    menus.forEach((menu) => {
+      menu.open = false;
+    });
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event): void {
+    const target = event.target;
+    if (!(target instanceof Element)) {
+      return;
+    }
+    if (target.closest('.table-actions-menu')) {
+      return;
+    }
+    this.closeActionMenus();
   }
 
   playCard(card: Card): void {

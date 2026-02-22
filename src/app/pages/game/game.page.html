@@ -1,10 +1,26 @@
 <section class="table">
+  <div class="portrait-header">
+    <details class="table-actions-menu">
+      <summary class="menu-trigger" aria-label="Open game actions">☰</summary>
+      <nav class="menu-panel" (click)="closeActionMenus()">
+        @if (state().rules.debugAiHistory) {
+          <button type="button" class="ghost-action" (click)="toggleDebugPanel()">
+            {{ debugPanelOpen() ? 'Hide Why' : 'Why' }}
+          </button>
+        }
+        <a routerLink="/results">Results</a>
+        <a routerLink="/">Exit</a>
+      </nav>
+    </details>
+    <h1 class="portrait-title">Cards</h1>
+  </div>
   <div class="table-ring top">
     @if (playerForSeat('north'); as player) {
       <div class="top-panel">
         <div class="top-row">
           <h1 class="table-title">Cards</h1>
           <app-game-player-chip
+            class="top-player-host"
             [player]="player"
             [roundPoints]="roundPoints()[player.id]"
             [avatar]="'🦈'"
@@ -22,6 +38,18 @@
             <a routerLink="/results">Results</a>
             <a routerLink="/">Exit</a>
           </nav>
+          <details class="table-actions-menu">
+            <summary class="menu-trigger" aria-label="Open game actions">☰</summary>
+            <nav class="menu-panel" (click)="closeActionMenus()">
+              @if (state().rules.debugAiHistory) {
+                <button type="button" class="ghost-action" (click)="toggleDebugPanel()">
+                  {{ debugPanelOpen() ? 'Hide Why' : 'Why' }}
+                </button>
+              }
+              <a routerLink="/results">Results</a>
+              <a routerLink="/">Exit</a>
+            </nav>
+          </details>
         </div>
       </div>
     }
