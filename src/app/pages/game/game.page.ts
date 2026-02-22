@@ -72,6 +72,17 @@ export class GamePageComponent {
     }
     return sortCards(this.rules.getLegalPlays(this.state(), player));
   });
+  readonly showTwoClubsPrompt = computed(() => {
+    if (this.state().phase !== 'play') {
+      return false;
+    }
+    const player = this.currentPlayer();
+    if (!player || player.type !== 'human') {
+      return false;
+    }
+    const legal = this.legalPlays();
+    return legal.length === 1 && legal[0].suit === 'clubs' && legal[0].rank === '2';
+  });
   readonly passDirectionArrow = computed(() => {
     switch (this.state().passDirection) {
       case 'left':
@@ -215,6 +226,22 @@ export class GamePageComponent {
       this.isPassComplete() &&
       passSourcePlayerId(this.state().players, this.state().passDirection) === playerId
     );
+  }
+
+  passInstruction(): string {
+    const direction = this.state().passDirection;
+    const targetId = passTargetPlayerId(this.state().players, direction);
+    const targetName = targetId ? this.playerName(targetId) : 'the next player';
+    if (direction === 'none') {
+      return 'No pass this round';
+    }
+    return `Pick three cards and pass them ${direction} to ${targetName}`;
+  }
+
+  acceptCardsInstruction(): string {
+    const sourceId = passSourcePlayerId(this.state().players, this.state().passDirection);
+    const sourceName = sourceId ? this.playerName(sourceId) : 'the other player';
+    return `Accept cards from ${sourceName}`;
   }
 
   factorEntries(trace: { factors: Record<string, string | number | boolean> }): Array<{ key: string; value: string | number | boolean }> {

@@ -75,6 +75,11 @@
           </div>
         }
       </div>
+      @if (showTwoClubsPrompt()) {
+        <div class="trick-subtle-hint" role="status" aria-live="polite">
+          Lead with 2♣.
+        </div>
+      }
       @if (state().trickTaking && state().trickWinnerId) {
         <div class="trick-winner-label">{{ playerName(state().trickWinnerId!) }} won the trick</div>
       }
@@ -89,13 +94,11 @@
           [disabled]="isNoPassRound() ? !isPassComplete() : (isPassing() ? !isPassComplete() : selectedPassCards().length !== 3)"
         >
           @if (isNoPassRound()) {
-            <span class="pass-text">Proceed</span>
+            <span class="pass-text">No cards are passed this round. Continue when ready.</span>
           } @else if (isPassing()) {
-            <span class="pass-text">Continue</span>
+            <span class="pass-text">{{ acceptCardsInstruction() }}</span>
           } @else {
-            <span class="pass-text">Pass</span>
-            <span class="pass-arrow" aria-hidden="true">{{ passDirectionArrow() }}</span>
-            <span class="pass-target">{{ passDirectionLabel() }}</span>
+            <span class="pass-text">{{ passInstruction() }}</span>
           }
         </button>
       }

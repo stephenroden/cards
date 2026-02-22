@@ -27,11 +27,11 @@ const isThemeId = (value: string): value is ThemeId => THEME_OPTIONS.some((theme
 })
 export class ThemeService {
   readonly options = THEME_OPTIONS;
-  readonly theme = signal<ThemeId>('classic');
+  readonly theme = signal<ThemeId>('sunset');
 
   initialize(): void {
     const saved = globalThis.localStorage?.getItem(THEME_STORAGE_KEY);
-    const initial = saved && isThemeId(saved) ? saved : 'classic';
+    const initial = saved && isThemeId(saved) ? saved : 'sunset';
     this.setTheme(initial);
   }
 

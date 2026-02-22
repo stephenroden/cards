@@ -15,7 +15,6 @@
   min-height: 0;
   border-radius: 28px;
   background: var(--app-bg);
-  border: 2px solid rgba(255, 255, 255, 0.2);
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   grid-template-rows: auto minmax(0, 1fr) minmax(0, 1fr);
@@ -184,6 +183,14 @@
   width: 100%;
   min-height: 80px;
   flex: 1;
+}
+
+.trick-subtle-hint {
+  margin-top: 2px;
+  font-size: 11px;
+  line-height: 1.2;
+  opacity: 0.72;
+  letter-spacing: 0.01em;
 }
 
 .trick-card {
@@ -434,14 +441,27 @@
     box-shadow 180ms ease;
 }
 
+@media (max-width: 900px) {
+  .card.passing {
+    transform: translateX(calc(var(--offset) * var(--spread)))
+      translateX(-50%)
+      rotate(calc(var(--offset) * var(--tilt)))
+      translateY(-8px);
+  }
+}
+
 .card.received {
   box-shadow:
-    0 0 14px rgba(120, 220, 170, 0.7),
+    0 0 18px rgba(120, 220, 170, 0.95),
+    0 0 34px rgba(120, 220, 170, 0.55),
     0 6px 18px rgba(0, 0, 0, 0.3);
+  outline: 2px solid rgba(170, 255, 210, 0.95);
+  outline-offset: 2px;
   transform: translateX(calc(var(--offset) * var(--spread)))
     translateX(-50%)
     rotate(calc(var(--offset) * var(--tilt)))
     translateY(-8px);
+  animation: received-pulse 950ms ease-in-out infinite;
 }
 
 .card.sent {
@@ -498,6 +518,16 @@
   to {
     translate: 0 -24px;
     opacity: 0;
+  }
+}
+
+@keyframes received-pulse {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.12);
   }
 }
 

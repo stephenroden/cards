@@ -2,17 +2,20 @@
   display: block;
   min-height: 100svh;
   min-height: 100dvh;
+  overflow: hidden;
   color: var(--text-primary);
 }
 
 .app-shell {
   min-height: 100svh;
   min-height: 100dvh;
+  overflow: hidden;
 }
 
 .app-content {
   min-height: 100svh;
   min-height: 100dvh;
+  overflow: hidden;
 }
 
 .orientation-notice {
