@@ -1,0 +1,150 @@
+<section class="poker-shell">
+  <header class="table-header">
+    <div class="header-title">
+      <details class="table-actions-menu">
+        <summary class="menu-trigger" aria-label="Open poker actions">☰</summary>
+        <nav class="menu-panel">
+          <a routerLink="/results/poker">Results</a>
+          <a routerLink="/">Exit</a>
+        </nav>
+      </details>
+      <h1>Poker</h1>
+    </div>
+  </header>
+
+  <section class="table-stage">
+    <div class="side-seat north">
+      @if (playerForSeat('north'); as player) {
+        <article class="opponent-pod north" [class.acting]="actingPlayer().id === player.id" [class.folded]="player.folded">
+          <div class="pod-head">
+            <strong>{{ player.name }}</strong>
+            <span>{{ player.stack }} chips</span>
+          </div>
+          @if (revealOpponentCards(player)) {
+            <div class="pod-cards">
+              @for (card of player.hand; track $index) {
+                <img [src]="cardImage(card)" [alt]="card.rank + ' of ' + card.suit" />
+              }
+            </div>
+          }
+          <p>{{ playerBadgeDetail(player) }}</p>
+        </article>
+      }
+    </div>
+
+    <div class="side-seat west">
+      @if (playerForSeat('west'); as player) {
+        <article class="opponent-pod side" [class.acting]="actingPlayer().id === player.id" [class.folded]="player.folded">
+          <div class="pod-head">
+            <strong>{{ player.name }}</strong>
+            <span>{{ player.stack }}</span>
+          </div>
+          @if (revealOpponentCards(player)) {
+            <div class="pod-cards">
+              @for (card of player.hand; track $index) {
+                <img [src]="cardImage(card)" [alt]="card.rank + ' of ' + card.suit" />
+              }
+            </div>
+          }
+          <p>{{ playerBadgeDetail(player) }}</p>
+        </article>
+      }
+    </div>
+
+    <div class="board-shell">
+      <div class="board-summary">
+        <div class="summary-chip">
+          <span class="label">Pot</span>
+          <strong>{{ pot() }}</strong>
+        </div>
+        <div class="summary-chip">
+          <span class="label">Street</span>
+          <strong>{{ state().street | titlecase }}</strong>
+        </div>
+        <div class="summary-chip">
+          <span class="label">{{ actingPlayer().type === 'human' ? 'To call' : 'Live bet' }}</span>
+          <strong>{{ actingPlayer().type === 'human' ? callAmount() : state().currentBet }}</strong>
+        </div>
+      </div>
+
+      <div class="board-felt">
+        <div class="board-cards">
+          @for (card of state().communityCards; track $index) {
+            <img [src]="cardImage(card)" [alt]="card.rank + ' of ' + card.suit" />
+          }
+          @for (_ of emptyBoardSlots(); track $index) {
+            <div class="board-slot"></div>
+          }
+        </div>
+
+        <p class="table-message">{{ state().message }}</p>
+      </div>
+    </div>
+
+    <div class="side-seat east">
+      @if (playerForSeat('east'); as player) {
+        <article class="opponent-pod side" [class.acting]="actingPlayer().id === player.id" [class.folded]="player.folded">
+          <div class="pod-head">
+            <strong>{{ player.name }}</strong>
+            <span>{{ player.stack }}</span>
+          </div>
+          @if (revealOpponentCards(player)) {
+            <div class="pod-cards">
+              @for (card of player.hand; track $index) {
+                <img [src]="cardImage(card)" [alt]="card.rank + ' of ' + card.suit" />
+              }
+            </div>
+          }
+          <p>{{ playerBadgeDetail(player) }}</p>
+        </article>
+      }
+    </div>
+  </section>
+
+  <section class="decision-dock">
+    @if (playerForSeat('south'); as player) {
+      <article class="hero-panel" [class.acting]="actingPlayer().id === player.id">
+        <div class="hero-topline">
+          <div>
+            <strong>{{ player.name }}</strong>
+            <p>{{ player.stack }} chips</p>
+          </div>
+          <div class="hero-stats">
+            <span>{{ playerStatus(player) }}</span>
+            <span>{{ expectationText() }}</span>
+          </div>
+        </div>
+
+        <div class="hero-cards">
+          @for (card of player.hand; track $index) {
+            <img [src]="cardImage(card)" [alt]="card.rank + ' of ' + card.suit" />
+          }
+        </div>
+
+        <div class="hero-actions">
+          @if (actingPlayer().type === 'human' && inActionPhase()) {
+            <div class="actions">
+              <button type="button" class="danger" (click)="play('fold')" [disabled]="!can('fold')">Fold</button>
+              <button type="button" (click)="play('check')" [disabled]="!can('check')">Check</button>
+              <button type="button" (click)="play('call')" [disabled]="!can('call')">Call {{ callAmount() }}</button>
+              <button type="button" (click)="play('bet')" [disabled]="!can('bet')">Bet</button>
+              <button type="button" class="primary" (click)="play('raise')" [disabled]="!can('raise')">Raise</button>
+            </div>
+          }
+
+          @if (state().phase === 'hand-summary') {
+            <div class="actions">
+              <button type="button" class="primary" (click)="nextHand()">Deal Next Hand</button>
+            </div>
+          }
+
+          @if (state().phase === 'session-over') {
+            <div class="actions">
+              <button type="button" class="primary" (click)="newSession()">Start New Session</button>
+            </div>
+          }
+        </div>
+      </article>
+    }
+  </section>
+</section>

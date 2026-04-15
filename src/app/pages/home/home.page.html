@@ -1,26 +1,8 @@
 <section class="home">
   <div class="home-card">
-    <h2>Hearts</h2>
-    <label class="rule-toggle">
-      <input
-        #jackToggle
-        type="checkbox"
-        [checked]="jackOfDiamondsMinus10()"
-        (change)="setJackOfDiamondsMinus10(jackToggle.checked)"
-      />
-      <span>Enable J♦ = -10 variant</span>
-    </label>
-    <p class="rule-help">When enabled, taking the Jack of Diamonds subtracts 10 points.</p>
-    <label class="rule-toggle">
-      <input
-        #debugToggle
-        type="checkbox"
-        [checked]="debugAiHistory()"
-        (change)="setDebugAiHistory(debugToggle.checked)"
-      />
-      <span>Enable AI debug history</span>
-    </label>
-    <p class="rule-help">Shows per-CPU play-by-play reasons during the round. Default on.</p>
+    <h2>Cards Pack</h2>
+    <p>Pick a game to play.</p>
+
     <label class="rule-toggle theme-toggle">
       <span>Color scheme</span>
       <select #themeSelect (change)="setTheme(themeSelect.value)">
@@ -29,9 +11,38 @@
         }
       </select>
     </label>
-    <div class="home-actions">
-      <a class="primary" routerLink="/game" (click)="startGame()">Start Game</a>
-      <a class="ghost" routerLink="/rules">Rules</a>
+
+    <div class="pack-grid">
+      <article class="game-tile">
+        <h3>Hearts</h3>
+        <label class="rule-toggle">
+          <input
+            #jackToggle
+            type="checkbox"
+            [checked]="jackOfDiamondsMinus10()"
+            (change)="setJackOfDiamondsMinus10(jackToggle.checked)"
+          />
+          <span>J♦ = -10 variant</span>
+        </label>
+        <label class="rule-toggle">
+          <input
+            #debugToggle
+            type="checkbox"
+            [checked]="debugAiHistory()"
+            (change)="setDebugAiHistory(debugToggle.checked)"
+          />
+          <span>AI debug history</span>
+        </label>
+        <a class="primary" routerLink="/game/hearts" (click)="prepareHeartsGame()">Play Hearts</a>
+        <a class="ghost" routerLink="/rules/hearts">Rules</a>
+      </article>
+
+      <article class="game-tile poker-tile">
+        <h3>Poker</h3>
+        <p>Texas Hold'em, fixed-limit betting, session stacks.</p>
+        <a class="primary" routerLink="/game/poker">Play Poker</a>
+        <a class="ghost" routerLink="/rules/poker">Rules</a>
+      </article>
     </div>
   </div>
 </section>

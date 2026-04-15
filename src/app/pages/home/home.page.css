@@ -1,31 +1,57 @@
 .home {
-  min-height: calc(100dvh - 52px);
+  min-height: 100dvh;
   display: grid;
   place-items: center;
   padding: 16px;
 }
 
 .home-card {
-  width: min(360px, 100%);
+  width: min(860px, 100%);
   border-radius: 16px;
   padding: 20px;
+  background: var(--surface-soft);
+  border: 1px solid var(--border-soft);
 }
 
 .home-card h2 {
-  margin: 0 0 8px;
-  font-size: 24px;
+  margin: 0 0 6px;
 }
 
-.home-card p {
+.home-card > p {
   margin: 0 0 16px;
   color: var(--text-muted);
+}
+
+.pack-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.game-tile {
+  border: 1px solid var(--border-soft);
+  background: var(--surface-strong);
+  border-radius: 14px;
+  padding: 14px;
+  display: grid;
+  gap: 10px;
+}
+
+.game-tile h3 {
+  margin: 0;
+}
+
+.game-tile p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 14px;
 }
 
 .rule-toggle {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin: 4px 0 6px;
+  margin: 0;
   font-size: 14px;
 }
 
@@ -34,10 +60,8 @@
   height: 16px;
 }
 
-.rule-help {
-  margin: 0 0 16px;
-  font-size: 12px;
-  color: var(--text-muted);
+.theme-toggle {
+  margin-bottom: 14px;
 }
 
 .rule-toggle select {
@@ -50,76 +74,31 @@
   padding: 6px 8px;
 }
 
-.home-actions {
-  display: grid;
-  gap: 10px;
-}
-
-.home-actions a {
+.primary,
+.ghost {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 44px;
-  border-radius: 12px;
+  height: 42px;
+  border-radius: 10px;
   font-weight: 600;
 }
 
-.home-actions .primary {
+.primary {
   background: var(--accent-primary);
   color: var(--accent-on-primary);
 }
 
-.home-actions .ghost {
+.ghost {
   border: 1px solid var(--border-soft);
 }
 
-@media (max-height: 520px) and (orientation: landscape) {
-  .home {
-    min-height: 100dvh;
-    padding: 10px;
-  }
+.poker-tile {
+  background: linear-gradient(160deg, color-mix(in srgb, var(--surface-strong) 85%, #0d3f20 15%), var(--surface-strong));
+}
 
-  .home-card {
-    width: min(700px, 100%);
-    padding: 12px 14px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0 16px;
-    align-items: start;
-  }
-
-  .home-card h2 {
-    margin: 0 0 6px;
-    font-size: 20px;
-    grid-column: 1 / -1;
-  }
-
-  .rule-toggle {
-    margin: 2px 0 4px;
-    font-size: 13px;
-    grid-column: 1;
-  }
-
-  .rule-help {
-    margin: 0 0 10px;
-    font-size: 11px;
-    grid-column: 1;
-  }
-
-  .theme-toggle {
-    grid-column: 2;
-    grid-row: 2;
-    align-self: start;
-  }
-
-  .home-actions {
-    grid-column: 1 / -1;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    margin-top: 0;
-  }
-
-  .home-actions a {
-    height: 38px;
+@media (max-width: 760px) {
+  .pack-grid {
+    grid-template-columns: 1fr;
   }
 }

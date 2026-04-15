@@ -1,0 +1,542 @@
+:host {
+  display: block;
+  height: 100dvh;
+  overflow: hidden;
+  --card-w: clamp(34px, 4.1vw, 54px);
+  --board-card-w: clamp(60px, 7.5vw, 96px);
+  --card-radius: 8px;
+  --poker-felt-glow: color-mix(in srgb, var(--accent-primary) 28%, transparent);
+  --poker-felt-core: color-mix(in srgb, var(--surface-strong) 72%, #0c2719 28%);
+  --poker-felt-edge: color-mix(in srgb, var(--surface-strong) 84%, #020705 16%);
+  --poker-panel: color-mix(in srgb, var(--surface-strong) 78%, transparent);
+  --poker-panel-strong: color-mix(in srgb, var(--surface-strong) 92%, transparent);
+  --poker-panel-border: color-mix(in srgb, var(--border-soft) 72%, transparent);
+  --poker-muted: color-mix(in srgb, var(--text-primary) 78%, transparent);
+  --poker-subtle: color-mix(in srgb, var(--text-primary) 58%, transparent);
+  --poker-button: color-mix(in srgb, var(--surface-soft) 68%, white 8%);
+  --poker-danger: color-mix(in srgb, #8a2d25 54%, var(--surface-strong) 46%);
+  --poker-card-back-start: color-mix(in srgb, var(--accent-on-primary) 42%, #27314f 58%);
+  --poker-card-back-end: color-mix(in srgb, var(--surface-strong) 72%, #141a2e 28%);
+}
+
+.poker-shell {
+  height: 100%;
+  padding: clamp(8px, 1.2vh, 12px);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: clamp(6px, 1vh, 12px);
+  color: var(--text-primary);
+  background:
+    radial-gradient(circle at 50% 18%, var(--poker-felt-glow), transparent 26%),
+    radial-gradient(circle at 50% 52%, var(--poker-felt-core), var(--poker-felt-edge));
+  border-radius: 28px;
+  overflow: hidden;
+}
+
+.table-header {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.header-title {
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-title h1 {
+  margin: 0;
+  font-size: clamp(20px, 3vh, 34px);
+  letter-spacing: 0.03em;
+}
+
+.hero-stats span {
+  padding: 6px 10px;
+  font-size: 11px;
+  color: var(--text-primary);
+  background: color-mix(in srgb, var(--surface-soft) 72%, transparent);
+  border: 1px solid var(--poker-panel-border);
+  border-radius: 999px;
+}
+
+.table-actions-menu {
+  position: relative;
+}
+
+.menu-trigger {
+  list-style: none;
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  border: 0;
+  background: color-mix(in srgb, var(--surface-soft) 62%, transparent);
+  border: 1px solid var(--poker-panel-border);
+  color: var(--text-primary);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.menu-trigger::-webkit-details-marker {
+  display: none;
+}
+
+.menu-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 20;
+  display: grid;
+  gap: 6px;
+  min-width: 132px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  border: 1px solid var(--poker-panel-border);
+  background: var(--poker-panel-strong);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+}
+
+.menu-panel a {
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.table-stage {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(110px, 14vw) minmax(0, 1fr) minmax(110px, 14vw);
+  grid-template-rows: auto minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(8px, 1.2vw, 18px);
+}
+
+.side-seat {
+  display: flex;
+  justify-content: center;
+}
+
+.side-seat.north {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.side-seat.west {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.side-seat.east {
+  grid-column: 3;
+  grid-row: 2;
+}
+
+.board-shell {
+  grid-column: 2;
+  grid-row: 2;
+  min-height: 0;
+  display: grid;
+  gap: 8px;
+  align-content: center;
+  justify-items: center;
+}
+
+.board-summary {
+  width: min(100%, 540px);
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.summary-chip {
+  padding: 8px 10px;
+  display: grid;
+  gap: 3px;
+  text-align: center;
+}
+
+.summary-chip .label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--poker-subtle);
+}
+
+.summary-chip strong {
+  font-size: 14px;
+}
+
+.board-felt {
+  width: min(100%, 640px);
+  min-height: clamp(120px, 24vh, 220px);
+  padding: clamp(10px, 1.8vh, 18px);
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 10px;
+}
+
+.board-cards {
+  display: flex;
+  justify-content: center;
+  gap: clamp(5px, 0.8vw, 10px);
+  min-height: calc(var(--board-card-w) * 1.4);
+}
+
+.board-cards img,
+.hero-cards img,
+.pod-cards img,
+.card-back,
+.board-slot {
+  width: var(--card-w);
+  aspect-ratio: 5 / 7;
+  height: auto;
+}
+
+.board-cards img,
+.board-slot {
+  width: var(--board-card-w);
+}
+
+.board-cards img,
+.hero-cards img,
+.pod-cards img {
+  border-radius: 3px;
+}
+
+.card-back,
+.board-slot {
+  border-radius: var(--card-radius);
+}
+
+.board-slot {
+  border: 1px dashed var(--poker-panel-border);
+  background: color-mix(in srgb, var(--surface-soft) 28%, transparent);
+}
+
+.table-message {
+  margin: 0;
+  max-width: 52ch;
+  text-align: center;
+  font-size: 11px;
+  color: var(--poker-muted);
+}
+
+.opponent-pod,
+.hero-panel {
+  min-width: 0;
+  display: grid;
+  gap: 6px;
+  padding: 8px 10px;
+  border-radius: 18px;
+  border: 1px solid var(--poker-panel-border);
+  background: var(--poker-panel);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.14);
+  backdrop-filter: blur(6px);
+}
+
+.opponent-pod {
+  width: min(100%, 220px);
+  justify-items: center;
+  text-align: center;
+}
+
+.opponent-pod.side {
+  width: min(100%, 136px);
+}
+
+.opponent-pod.north {
+  width: min(100%, 220px);
+}
+
+.opponent-pod.folded {
+  opacity: 0.56;
+}
+
+.opponent-pod.acting,
+.hero-panel.acting {
+  border-color: color-mix(in srgb, var(--accent-primary) 82%, white 18%);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--accent-primary) 48%, transparent),
+    0 10px 26px rgba(0, 0, 0, 0.18);
+}
+
+.pod-head,
+.hero-topline {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: start;
+}
+
+.pod-head {
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  text-align: center;
+  font-size: 12px;
+}
+
+.pod-cards,
+.hero-cards {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+}
+
+.opponent-pod.side .pod-cards {
+  flex-direction: column;
+  align-items: center;
+}
+
+.card-back {
+  background:
+    repeating-linear-gradient(
+      45deg,
+      var(--poker-card-back-start),
+      var(--poker-card-back-start) 6px,
+      var(--poker-card-back-end) 6px,
+      var(--poker-card-back-end) 12px
+    );
+}
+
+.opponent-pod p,
+.hero-topline p {
+  margin: 0;
+  font-size: 11px;
+  color: var(--poker-muted);
+}
+
+.opponent-pod p {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.decision-dock {
+  display: flex;
+  justify-content: center;
+  min-height: 0;
+}
+
+.hero-panel {
+  width: min(100%, 760px);
+  gap: 10px;
+  padding: clamp(10px, 1.6vh, 16px);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--surface-soft) 82%, #050907 18%), var(--poker-panel-strong)),
+    var(--poker-panel);
+}
+
+.hero-topline strong {
+  display: block;
+  font-size: 18px;
+}
+
+.hero-stats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: end;
+  gap: 6px;
+  max-width: 62%;
+}
+
+.hero-cards {
+  gap: 10px;
+}
+
+.hero-cards img {
+  width: clamp(54px, 6vw, 84px);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.24);
+}
+
+.hero-actions {
+  display: grid;
+  gap: 6px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.actions button {
+  min-width: 86px;
+  height: 38px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid var(--poker-panel-border);
+  background: var(--poker-button);
+  color: inherit;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.actions .primary {
+  border: 0;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--accent-primary) 86%, white 14%),
+    color-mix(in srgb, var(--accent-primary) 78%, black 22%)
+  );
+  color: var(--accent-on-primary);
+}
+
+.actions .danger {
+  background: var(--poker-danger);
+}
+
+@media (max-width: 860px) {
+  :host {
+    --card-w: clamp(32px, 5vw, 44px);
+    --board-card-w: clamp(56px, 11vw, 84px);
+  }
+
+  .table-header {
+    justify-content: flex-start;
+    text-align: center;
+  }
+
+  .table-stage {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .side-seat {
+    width: 100%;
+  }
+
+  .side-seat.north,
+  .side-seat.west,
+  .side-seat.east {
+    grid-row: 1;
+    justify-content: center;
+  }
+
+  .side-seat.north {
+    grid-column: 2;
+  }
+
+  .side-seat.west {
+    grid-column: 1;
+  }
+
+  .side-seat.east {
+    grid-column: 3;
+  }
+
+  .side-seat .opponent-pod {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .opponent-pod.side .pod-cards,
+  .opponent-pod.north .pod-cards {
+    flex-direction: row;
+  }
+
+  .board-shell {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .hero-panel {
+    width: min(100%, 680px);
+  }
+}
+
+@media (max-width: 560px) {
+  :host {
+    --card-w: clamp(28px, 8vw, 36px);
+    --board-card-w: clamp(54px, 13vw, 76px);
+  }
+
+  .poker-shell {
+    padding: 8px;
+    gap: 6px;
+  }
+
+  .table-stage {
+    gap: 6px;
+  }
+
+  .hero-stats {
+    gap: 4px;
+  }
+
+  .hero-stats span {
+    padding: 5px 8px;
+    font-size: 10px;
+  }
+
+  .board-summary {
+    gap: 6px;
+  }
+
+  .summary-chip {
+    padding: 6px 7px;
+  }
+
+  .summary-chip strong {
+    font-size: 12px;
+  }
+
+  .pod-head {
+    font-size: 11px;
+  }
+
+  .opponent-pod,
+  .opponent-pod.side,
+  .opponent-pod.north {
+    padding: 7px 8px;
+  }
+
+  .board-felt {
+    min-height: 110px;
+    padding: 8px 10px;
+    gap: 8px;
+  }
+
+  .hero-topline {
+    display: grid;
+    gap: 6px;
+  }
+
+  .hero-stats {
+    max-width: none;
+    justify-content: start;
+  }
+
+  .hero-topline strong {
+    font-size: 16px;
+  }
+
+  .hero-cards {
+    gap: 8px;
+  }
+
+  .hero-cards img {
+    width: clamp(56px, 16vw, 72px);
+  }
+
+  .actions {
+    gap: 6px;
+  }
+
+  .actions button {
+    min-width: 72px;
+    height: 34px;
+    padding: 0 10px;
+    font-size: 11px;
+  }
+}

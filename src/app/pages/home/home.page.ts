@@ -3,8 +3,8 @@ import { RouterLink } from '@angular/router';
 import { GameStateService } from '../../game/services/game-state.service';
 import { ThemeService } from '../../theme.service';
 
-const JACK_OF_DIAMONDS_KEY = 'hearts.rules.jack_of_diamonds_minus_10';
-const DEBUG_AI_HISTORY_KEY = 'hearts.rules.debug_ai_history';
+const JACK_OF_DIAMONDS_KEY = 'cards.game.hearts.rules.jack_of_diamonds_minus_10';
+const DEBUG_AI_HISTORY_KEY = 'cards.game.hearts.rules.debug_ai_history';
 
 @Component({
   selector: 'app-home-page',
@@ -16,6 +16,7 @@ const DEBUG_AI_HISTORY_KEY = 'hearts.rules.debug_ai_history';
 export class HomePageComponent {
   private readonly gameState = inject(GameStateService);
   private readonly themeService = inject(ThemeService);
+
   readonly jackOfDiamondsMinus10 = signal(false);
   readonly debugAiHistory = signal(true);
   readonly themes = this.themeService.options;
@@ -26,9 +27,22 @@ export class HomePageComponent {
     this.jackOfDiamondsMinus10.set(saved === '1');
     const debugSaved = globalThis.localStorage?.getItem(DEBUG_AI_HISTORY_KEY);
     this.debugAiHistory.set(debugSaved !== '0');
+
+    if (globalThis.localStorage?.getItem('hearts.rules.jack_of_diamonds_minus_10') !== null) {
+      globalThis.localStorage?.setItem(
+        JACK_OF_DIAMONDS_KEY,
+        globalThis.localStorage.getItem('hearts.rules.jack_of_diamonds_minus_10') === '1' ? '1' : '0'
+      );
+    }
+    if (globalThis.localStorage?.getItem('hearts.rules.debug_ai_history') !== null) {
+      globalThis.localStorage?.setItem(
+        DEBUG_AI_HISTORY_KEY,
+        globalThis.localStorage.getItem('hearts.rules.debug_ai_history') === '0' ? '0' : '1'
+      );
+    }
   }
 
-  startGame(): void {
+  prepareHeartsGame(): void {
     const jdEnabled = this.jackOfDiamondsMinus10();
     const debugEnabled = this.debugAiHistory();
     globalThis.localStorage?.setItem(JACK_OF_DIAMONDS_KEY, jdEnabled ? '1' : '0');

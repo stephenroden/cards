@@ -132,7 +132,7 @@ export class GamePageComponent {
         this.hidePassedCards.set(false);
       }
       if (this.state().phase === 'summary') {
-        void this.router.navigate(['/results']);
+        void this.router.navigate(['/results/hearts']);
       }
       if (this.state().phase !== 'pass') {
         this.selectedPassCards.set([]);

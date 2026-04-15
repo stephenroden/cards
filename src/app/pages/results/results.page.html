@@ -1,28 +1,110 @@
 <section class="results">
-  <h2>Round {{ displayRound() }} Results</h2>
-  @if (gameStatus().isOver) {
-    <p>Game over. Winner: {{ winnerNames()[0] }}</p>
-  } @else if (thresholdReached()) {
-    <p>Tie for lowest score. Continue playing until one player is lowest.</p>
-  }
-  <div class="scoreboard">
-    <div class="scoreboard-head">
-      <span>Player</span>
-      <span class="num">Round</span>
-      <span class="num">Total</span>
-    </div>
-    @for (player of playersByScore(); track player.id) {
-      <div class="score-row">
-        <span class="player-name">{{ player.name }}</span>
-        <span class="player-round num">{{ roundPoints()[player.id] }}</span>
-        <span class="player-total num">{{ player.score }}</span>
+  @if (gameId() === 'hearts') {
+    <h2>Hearts: Round {{ displayRound() }} Results</h2>
+    @if (gameStatus().isOver) {
+      <p>Game over. Winner: {{ winnerNames()[0] }}</p>
+    } @else if (thresholdReached()) {
+      <p>Tie for lowest score. Continue playing until one player is lowest.</p>
+    }
+    <div class="scoreboard">
+      <div class="scoreboard-head">
+        <span>Player</span>
+        <span class="num">Round</span>
+        <span class="num">Total</span>
       </div>
+      @for (player of playersByScore(); track player.id) {
+        <div class="score-row">
+          <span class="player-name">{{ player.name }}</span>
+          <span class="player-round num">{{ roundPoints()[player.id] }}</span>
+          <span class="player-total num">{{ player.score }}</span>
+        </div>
+      }
+    </div>
+  } @else {
+    <h2>Poker Showdown</h2>
+    @if (pokerWinnerName()) {
+      <p>Current hand winner: {{ pokerWinnerName() }}</p>
     }
-  </div>
+    <section class="poker-showdown">
+      <div class="showdown-board">
+        @for (card of poker().communityCards; track $index) {
+          <img class="showdown-card board" [src]="cardImage(card)" [alt]="card.rank + ' of ' + card.suit" />
+        }
+      </div>
+
+      <div class="showdown-rows">
+        @for (row of pokerShowdownRows(); track row.player.id) {
+          <article class="showdown-row" [class.winner]="row.isWinner" [class.folded]="row.isFolded">
+            <div class="showdown-player">
+              <strong>{{ row.player.name }}</strong>
+              <span>{{ row.player.stack }} chips</span>
+              <span class="chip-delta" [class.positive]="row.net > 0" [class.negative]="row.net < 0">
+                {{ formatChipDelta(row.net) }} chips
+              </span>
+              <span>{{ row.evaluation.label }}</span>
+            </div>
+
+            <div class="showdown-cards">
+              @for (card of row.player.hand; track $index) {
+                <img
+                  class="showdown-card"
+                  [class.dimmed]="!isUsedInBestHand(row, card)"
+                  [src]="cardImage(card)"
+                  [alt]="card.rank + ' of ' + card.suit"
+                />
+              }
+            </div>
+
+            <span class="showdown-join">+</span>
+
+            <div class="showdown-cards board-copies">
+              @for (card of poker().communityCards; track $index) {
+                <img
+                  class="showdown-card"
+                  [class.dimmed]="!isUsedInBestHand(row, card)"
+                  [src]="cardImage(card)"
+                  [alt]="card.rank + ' of ' + card.suit"
+                />
+              }
+            </div>
+          </article>
+        }
+      </div>
+
+      <div class="scoreboard">
+        <div class="scoreboard-head">
+          <span>Player</span>
+          <span class="num">Hand</span>
+          <span class="num">Stack</span>
+          <span class="num">Status</span>
+        </div>
+        @for (player of pokerByResult(); track player.id) {
+          <div class="score-row">
+            <span class="player-name">{{ player.name }}</span>
+            <span
+              class="num chip-delta"
+              [class.positive]="(poker().lastHandNet[player.id] ?? 0) > 0"
+              [class.negative]="(poker().lastHandNet[player.id] ?? 0) < 0"
+            >
+              {{ formatChipDelta(poker().lastHandNet[player.id] ?? 0) }}
+            </span>
+            <span class="num">{{ player.stack }}</span>
+            <span class="num">{{ player.eliminated ? 'Out' : 'In' }}</span>
+          </div>
+        }
+      </div>
+    </section>
+  }
+
   <div class="actions">
-    @if (!gameStatus().isOver) {
-      <button class="primary" type="button" (click)="startNextRound()">Play Next Round</button>
+    @if (gameId() === 'poker' || !gameStatus().isOver) {
+      <button class="primary" type="button" (click)="startNextRound()">
+        {{ gameId() === 'hearts' ? 'Play Next Round' : 'Deal Next Hand' }}
+      </button>
     }
-    <button class="ghost" type="button" (click)="startNewGame()">Start New Game</button>
+    <button class="ghost" type="button" (click)="startNewGame()">
+      {{ gameId() === 'hearts' ? 'Start New Game' : 'Start New Session' }}
+    </button>
+    <a class="ghost" [routerLink]="'/game/' + gameId()">Back To Table</a>
   </div>
 </section>

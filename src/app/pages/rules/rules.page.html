@@ -1,11 +1,25 @@
 <section class="rules">
-  <h2>Hearts Rules</h2>
-  <ol>
-    <li>Follow suit if you can.</li>
-    <li>Hearts cannot be led until broken.</li>
-    <li>Hearts are worth 1 point; queen of spades is 13.</li>
-    <li>Optional variant: jack of diamonds is worth -10 points.</li>
-    <li>Shooting the moon scores 26 points to others.</li>
-  </ol>
-  <a class="ghost" routerLink="/">Back Home</a>
+  @if (gameId() === 'hearts') {
+    <h2>Hearts Rules</h2>
+    <ol>
+      <li>Follow suit if you can.</li>
+      <li>Hearts cannot be led until broken.</li>
+      <li>Hearts are worth 1 point; queen of spades is 13.</li>
+      <li>Optional variant: jack of diamonds is worth -10 points.</li>
+      <li>Shooting the moon scores 26 points to others.</li>
+    </ol>
+  } @else {
+    <h2>Poker Rules (Texas Hold'em)</h2>
+    <ol>
+      <li>4 players: you and 3 CPUs. Each hand deals 2 hole cards.</li>
+      <li>Fixed-limit betting: 2-chip bets preflop/flop, 4-chip bets turn/river.</li>
+      <li>Small blind is 1, big blind is 2, and the button rotates each hand.</li>
+      <li>Best five-card hand from seven cards wins at showdown.</li>
+      <li>Session continues until one player has all chips.</li>
+    </ol>
+  }
+  <div class="actions">
+    <a class="ghost" [routerLink]="'/game/' + gameId()">Back To Game</a>
+    <a class="ghost" routerLink="/">Back Home</a>
+  </div>
 </section>

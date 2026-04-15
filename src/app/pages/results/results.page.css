@@ -20,10 +20,110 @@
   overflow: auto;
 }
 
+.poker-showdown {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 12px;
+}
+
+.showdown-board {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px;
+  border-radius: 18px;
+  border: 1px solid var(--border-soft);
+  background: var(--surface-soft);
+}
+
+.showdown-rows {
+  min-height: 0;
+  display: grid;
+  gap: 10px;
+  overflow: auto;
+  padding-right: 4px;
+}
+
+.showdown-row {
+  display: grid;
+  grid-template-columns: minmax(120px, 160px) auto 28px 1fr;
+  gap: 10px;
+  align-items: center;
+  padding: 12px;
+  border-radius: 18px;
+  border: 1px solid var(--border-soft);
+  background: var(--surface-soft);
+}
+
+.showdown-row.winner {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent-primary) 50%, transparent);
+}
+
+.showdown-row.folded {
+  opacity: 0.6;
+}
+
+.showdown-player {
+  display: grid;
+  gap: 2px;
+}
+
+.showdown-player strong {
+  font-size: 16px;
+}
+
+.showdown-player span {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.chip-delta {
+  font-variant-numeric: tabular-nums;
+}
+
+.chip-delta.positive {
+  color: color-mix(in srgb, var(--accent-primary) 82%, white 18%);
+}
+
+.chip-delta.negative {
+  color: color-mix(in srgb, #ff8f84 72%, white 28%);
+}
+
+.showdown-cards {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.showdown-card {
+  width: clamp(42px, 5vw, 60px);
+  aspect-ratio: 5 / 7;
+  border-radius: 4px;
+  transition: opacity 140ms ease;
+}
+
+.showdown-card.board {
+  width: clamp(52px, 6vw, 72px);
+}
+
+.showdown-card.dimmed {
+  opacity: 0.28;
+  filter: grayscale(0.2);
+}
+
+.showdown-join {
+  font-size: 24px;
+  font-weight: 700;
+  text-align: center;
+  opacity: 0.7;
+}
+
 .scoreboard-head,
 .score-row {
   display: grid;
-  grid-template-columns: minmax(140px, 1fr) 90px 90px;
+  grid-template-columns: minmax(140px, 1fr) 90px 90px 90px;
   gap: 6px 16px;
   align-items: center;
 }
@@ -105,11 +205,47 @@
 
   .scoreboard-head,
   .score-row {
-    grid-template-columns: minmax(0, 1fr) minmax(52px, auto) minmax(52px, auto);
+    grid-template-columns: minmax(0, 1fr) minmax(52px, auto) minmax(52px, auto) minmax(52px, auto);
     gap: 6px 8px;
   }
 
   .scoreboard-head {
     font-size: 11px;
+  }
+
+  .poker-showdown {
+    gap: 10px;
+  }
+
+  .showdown-board {
+    padding: 10px;
+    gap: 6px;
+  }
+
+  .showdown-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .showdown-player {
+    text-align: center;
+  }
+
+  .showdown-cards {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .showdown-join {
+    display: none;
+  }
+
+  .showdown-card {
+    width: 40px;
+  }
+
+  .showdown-card.board {
+    width: 46px;
   }
 }
