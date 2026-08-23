@@ -29,6 +29,9 @@ yarn-error.log
 !.vscode/extensions.json
 .history/*
 
+# Netlify CLI local state (site link, resolved config, auto-installed build plugins)
+.netlify/
+
 # Miscellaneous
 /.angular/cache
 .sass-cache/
