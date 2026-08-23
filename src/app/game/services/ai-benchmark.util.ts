@@ -1,7 +1,7 @@
 import { DEFAULT_GAME_RULES, type Card, type GameRules, type GameState, type Player, RANKS, SUITS } from '../game.models';
 import { AiService } from './ai.service';
 import { RulesService } from './rules.service';
-import { scoreCard } from './scoring';
+import { applyRoundScores, MOON_POINTS, penaltyScoreCard } from './scoring';
 
 export const PROFILES = ['smart', 'card-shark', 'endgame-defensive', 'spade-pressure', 'anti-moon-sentinel'] as const;
 export type ProfileId = (typeof PROFILES)[number];
@@ -201,25 +201,24 @@ const simulateHand = (
     }
   }
 
-  const playersResult = players.map((player) => {
+  // Score through the game's own scorer so the bonus card and moon adjustments are counted exactly as they are in play.
+  const scored = applyRoundScores(
+    players.map((player) => ({ ...player, score: 0 })),
+    state.takenCards,
+    rules
+  );
+
+  const playersResult = players.map((player, idx) => {
     const taken = state.takenCards[player.id] ?? [];
-    const points = taken.reduce((sum, current) => sum + Math.max(0, scoreCard(current, rules)), 0);
-    const penaltyOnly = taken.reduce((sum, current) => {
-      if (current.suit === 'hearts') {
-        return sum + 1;
-      }
-      if (current.suit === 'spades' && current.rank === 'Q') {
-        return sum + 13;
-      }
-      return sum;
-    }, 0);
+    const points = scored[idx].score;
+    const penaltyOnly = taken.reduce((sum, current) => sum + penaltyScoreCard(current), 0);
     return {
       profileId: (player.aiProfileId ?? 'smart') as ProfileId,
       points,
       tookQueenSpades: taken.some((c) => c.suit === 'spades' && c.rank === 'Q'),
       playedQueenSpades: queenPlayedBy.has(player.id),
       safeDumpedQueenSpades: queenSafeDumpBy.has(player.id),
-      moonShot: penaltyOnly === 26,
+      moonShot: penaltyOnly === MOON_POINTS,
       capturedJackDiamonds: taken.some((c) => c.suit === 'diamonds' && c.rank === 'J')
     };
   });

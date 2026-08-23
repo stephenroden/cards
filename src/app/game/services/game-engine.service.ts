@@ -293,7 +293,7 @@ export class GameEngineService {
     };
     if (state.rules.debugAiHistory) {
       const trickCards = state.trick.cards.map((play) => `${play.card.rank}${suitGlyph(play.card.suit)}`).join(' ');
-      const trickPoints = state.trick.cards.reduce((sum, play) => sum + Math.max(0, scoreCard(play.card, state.rules)), 0);
+      const trickPoints = state.trick.cards.reduce((sum, play) => sum + scoreCard(play.card, state.rules), 0);
       const winnerName = state.players.find((player) => player.id === winnerId)?.name ?? winnerId;
       updatedState = {
         ...updatedState,

@@ -67,6 +67,16 @@ export const describeChoice = (
       factors: { ...factors, jdVariant: true, chosenValue: scoreCard(choice, state.rules) }
     };
   }
+  if (
+    state.trick.cards.some((play) => isJackDiamondsBonus(play.card, state.rules)) &&
+    wouldChoiceWinTrickNow(state, choice)
+  ) {
+    return {
+      reasonCode: 'capture_bonus_trick',
+      summary: `${profileLabel}: played ${cardName} to win the trick and collect the -10 J♦ on the table.`,
+      factors: { ...factors, jdVariant: true, trickValue: trickValue(state, choice) }
+    };
+  }
   if (!isLeading && leadSuit && choice.suit === leadSuit) {
     const winning = currentWinningCard(state.trick.cards);
     if (winning) {
@@ -227,6 +237,12 @@ const suitOrder: Record<Card['suit'], number> = {
   hearts: 2,
   spades: 3
 };
+
+const trickValue = (state: GameState, choice: Card): number =>
+  [...state.trick.cards.map((play) => play.card), choice].reduce(
+    (total, card) => total + scoreCard(card, state.rules),
+    0
+  );
 
 const isJackDiamondsBonus = (card: Card, rules: GameRules): boolean =>
   rules.jackOfDiamondsMinus10 && card.suit === 'diamonds' && card.rank === 'J';

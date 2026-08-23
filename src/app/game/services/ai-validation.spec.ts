@@ -139,6 +139,140 @@ describe('Ai strategy validation', () => {
     expect(decision.card.rank).toBe('4');
     expect(decision.trace.reasonCode).not.toBe('capture_bonus_jd');
   });
+
+  it('wins a trick that already holds an opponent J♦', () => {
+    const rules: GameRules = { jackOfDiamondsMinus10: true, debugAiHistory: true };
+    const p1 = buildPlayer('p1', 'smart', [card('diamonds', '5')]);
+    const p2 = buildPlayer('p2', 'smart', [card('diamonds', 'J')]);
+    const p3 = buildPlayer('p3', 'card-shark', [card('diamonds', '3'), card('diamonds', 'K')]);
+    const p4 = buildPlayer('p4', 'smart', [card('spades', '2')]);
+    const state: GameState = {
+      ...baseState([p1, p2, p3, p4], rules),
+      trick: {
+        leaderId: 'p1',
+        cards: [
+          { playerId: 'p1', card: card('diamonds', '5') },
+          { playerId: 'p2', card: card('diamonds', 'J') }
+        ]
+      },
+      turnPlayerId: 'p3'
+    };
+
+    const decision = ai.chooseCardWithReason(state, p3, [card('diamonds', '3'), card('diamonds', 'K')]);
+    expect(decision.card.rank).toBe('K');
+    expect(decision.trace.reasonCode).toBe('capture_bonus_trick');
+  });
+
+  it('ducks a J♦ trick when the variant is off', () => {
+    const rules: GameRules = { jackOfDiamondsMinus10: false, debugAiHistory: true };
+    const p1 = buildPlayer('p1', 'smart', [card('diamonds', '5')]);
+    const p2 = buildPlayer('p2', 'smart', [card('diamonds', 'J')]);
+    const p3 = buildPlayer('p3', 'card-shark', [card('diamonds', '3'), card('diamonds', 'K')]);
+    const p4 = buildPlayer('p4', 'smart', [card('spades', '2')]);
+    const state: GameState = {
+      ...baseState([p1, p2, p3, p4], rules),
+      trick: {
+        leaderId: 'p1',
+        cards: [
+          { playerId: 'p1', card: card('diamonds', '5') },
+          { playerId: 'p2', card: card('diamonds', 'J') }
+        ]
+      },
+      turnPlayerId: 'p3'
+    };
+
+    const decision = ai.chooseCardWithReason(state, p3, [card('diamonds', '3'), card('diamonds', 'K')]);
+    expect(decision.card.rank).toBe('3');
+  });
+
+  it('plays its own J♦ last to act when the trick stays net negative', () => {
+    const rules: GameRules = { jackOfDiamondsMinus10: true, debugAiHistory: true };
+    const p1 = buildPlayer('p1', 'smart', [card('diamonds', '5')]);
+    const p2 = buildPlayer('p2', 'smart', [card('diamonds', '2')]);
+    const p3 = buildPlayer('p3', 'smart', [card('hearts', '4')]);
+    const p4 = buildPlayer('p4', 'card-shark', [card('diamonds', 'J'), card('diamonds', '8')]);
+    const state: GameState = {
+      ...baseState([p1, p2, p3, p4], rules),
+      trick: {
+        leaderId: 'p1',
+        cards: [
+          { playerId: 'p1', card: card('diamonds', '5') },
+          { playerId: 'p2', card: card('diamonds', '2') },
+          { playerId: 'p3', card: card('hearts', '4') }
+        ]
+      },
+      turnPlayerId: 'p4'
+    };
+
+    const decision = ai.chooseCardWithReason(state, p4, [card('diamonds', 'J'), card('diamonds', '8')]);
+    expect(decision.card.rank).toBe('J');
+    expect(decision.trace.reasonCode).toBe('capture_bonus_jd');
+  });
+
+  it('does not cash J♦ into a trick that already carries Q♠', () => {
+    const rules: GameRules = { jackOfDiamondsMinus10: true, debugAiHistory: true };
+    const p1 = buildPlayer('p1', 'smart', [card('diamonds', '5')]);
+    const p2 = buildPlayer('p2', 'smart', [card('spades', 'Q')]);
+    const p3 = buildPlayer('p3', 'smart', [card('hearts', '4')]);
+    const p4 = buildPlayer('p4', 'card-shark', [card('diamonds', 'J'), card('diamonds', '8')]);
+    const state: GameState = {
+      ...baseState([p1, p2, p3, p4], rules),
+      trick: {
+        leaderId: 'p1',
+        cards: [
+          { playerId: 'p1', card: card('diamonds', '5') },
+          { playerId: 'p2', card: card('spades', 'Q') },
+          { playerId: 'p3', card: card('hearts', '4') }
+        ]
+      },
+      turnPlayerId: 'p4'
+    };
+
+    const decision = ai.chooseCardWithReason(state, p4, [card('diamonds', 'J'), card('diamonds', '8')]);
+    expect(decision.card.rank).toBe('8');
+  });
+
+  it('never leads J♦ while higher diamonds are unseen', () => {
+    const rules: GameRules = { jackOfDiamondsMinus10: true, debugAiHistory: true };
+    const hand = [card('diamonds', 'J'), card('clubs', '9'), card('hearts', '3')];
+    const leaders = ['smart', 'card-shark', 'endgame-defensive', 'anti-moon-sentinel'];
+
+    for (const profileId of leaders) {
+      const p1 = buildPlayer('p1', profileId, hand);
+      const others = ['p2', 'p3', 'p4'].map((id) => buildPlayer(id, 'smart', [card('clubs', '4')]));
+      const state: GameState = {
+        ...baseState([p1, ...others], rules),
+        heartsBroken: true,
+        trick: { leaderId: 'p1', cards: [] },
+        turnPlayerId: 'p1'
+      };
+
+      const decision = ai.chooseCardWithReason(state, p1, hand);
+      expect(`${profileId}:${decision.card.rank}${decision.card.suit}`).not.toBe(`${profileId}:Jdiamonds`);
+    }
+  });
+
+  it('leads J♦ once it is the highest diamond left', () => {
+    const rules: GameRules = { jackOfDiamondsMinus10: true, debugAiHistory: true };
+    const hand = [card('diamonds', 'J'), card('clubs', '9')];
+    const p1 = buildPlayer('p1', 'card-shark', hand);
+    const others = ['p2', 'p3', 'p4'].map((id) => buildPlayer(id, 'smart', [card('clubs', '4')]));
+    const seen: Card[] = [
+      card('diamonds', 'A'),
+      card('diamonds', 'K'),
+      card('diamonds', 'Q')
+    ];
+    const state: GameState = {
+      ...baseState([p1, ...others], rules),
+      trick: { leaderId: 'p1', cards: [] },
+      turnPlayerId: 'p1',
+      playHistory: seen.map((c, idx) => ({ playerId: `p${idx + 1}`, card: c }))
+    };
+
+    const decision = ai.chooseCardWithReason(state, p1, hand);
+    expect(decision.card.rank).toBe('J');
+    expect(decision.trace.reasonCode).toBe('capture_bonus_jd');
+  });
 });
 
 const simulateRound = (

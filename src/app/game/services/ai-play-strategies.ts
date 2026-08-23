@@ -1,4 +1,4 @@
-import { Card, GameState, Player, Suit } from '../game.models';
+import { Card, GameRules, GameState, Player, Suit } from '../game.models';
 import { AiProfile, AI_PROFILES } from './ai-profiles';
 import { AiStrategy } from './ai-strategy';
 import { isDangerCard, scoreCard } from './scoring';
@@ -18,22 +18,28 @@ export class SmartStrategy implements AiStrategy {
     const trick = state.trick.cards;
     if (trick.length === 0) {
       const safeLead = legalCards.filter((card) => !isDangerCard(card, rules));
-      return lowestCard(safeLead.length > 0 ? safeLead : legalCards);
+      const leadCandidates = keepJackDiamondsIfPossible(safeLead.length > 0 ? safeLead : legalCards, rules);
+      return lowestCard(leadCandidates);
     }
 
     const leadSuit = trick[0].card.suit;
     const following = legalCards.filter((card) => card.suit === leadSuit);
     const winning = currentWinningCard(trick);
     const trickHasPoints = trick.some((play) => scoreCard(play.card, rules) > 0);
+    const trickIsWorthWinning = trickValue(trick, rules) < 0;
     const pendingPlayers = remainingPlayersInTrick(state, playerId, trick);
     const pendingPassedDanger = hasPendingPassedDangerInSuit(memory, pendingPlayers, leadSuit);
 
     if (following.length > 0 && winning) {
       const belowWin = following.filter((card) => rankOrder[card.rank] < rankOrder[winning.rank]);
-      if ((trickHasPoints || pendingPassedDanger) && belowWin.length > 0) {
-        return highestCard(belowWin);
+      const aboveWin = following.filter((card) => rankOrder[card.rank] > rankOrder[winning.rank]);
+      if (trickIsWorthWinning && aboveWin.length > 0) {
+        return highestCard(aboveWin);
       }
-      return lowestCard(following);
+      if ((trickHasPoints || pendingPassedDanger) && belowWin.length > 0) {
+        return highestCard(keepJackDiamondsIfPossible(belowWin, rules));
+      }
+      return lowestCard(keepJackDiamondsIfPossible(following, rules));
     }
 
     const points = legalCards.filter((card) => scoreCard(card, rules) > 0);
@@ -63,6 +69,7 @@ export class CardSharkStrategy implements AiStrategy {
     const following = legalCards.filter((card) => card.suit === leadSuit);
     const winning = currentWinningCard(trick);
     const trickHasPoints = trick.some((play) => scoreCard(play.card, rules) > 0);
+    const trickPoints = trickValue(trick, rules);
     const isLastToAct = trick.length === 3;
     const pendingPlayers = remainingPlayersInTrick(state, playerId, trick);
     const pendingPassedDanger = hasPendingPassedDangerInSuit(memory, pendingPlayers, leadSuit);
@@ -71,7 +78,8 @@ export class CardSharkStrategy implements AiStrategy {
       const belowWin = following.filter((card) => rankOrder[card.rank] < rankOrder[winning.rank]);
       const aboveWin = following.filter((card) => rankOrder[card.rank] > rankOrder[winning.rank]);
       const bossCards = following.filter((card) => unseenHigherCount(card, memory) === 0);
-      const hasJackDiamonds = following.some((card) => isJackDiamondsBonus(card, state.rules));
+      const jackDiamonds = following.find((card) => isJackDiamondsBonus(card, state.rules));
+      const hasJackDiamonds = Boolean(jackDiamonds);
       const queenSpades = following.find((card) => card.suit === 'spades' && card.rank === 'Q');
       const queenWouldCurrentlyWin =
         Boolean(queenSpades) &&
@@ -81,6 +89,25 @@ export class CardSharkStrategy implements AiStrategy {
         queenWouldCurrentlyWin &&
         !isLastToAct &&
         highOvertakeProbabilityForQueen(memory, pendingPlayers);
+
+      // Cash our own J♦ whenever the win is certain and the trick stays net-negative.
+      if (
+        jackDiamonds &&
+        rankOrder['J'] > rankOrder[winning.rank] &&
+        (isLastToAct || unseenHigherCount(jackDiamonds, memory) === 0) &&
+        trickPoints + scoreCard(jackDiamonds, rules) < 0
+      ) {
+        return jackDiamonds;
+      }
+
+      // Somebody else put the bonus on the table: take the trick when the win is certain.
+      if (trickPoints < 0 && aboveWin.length > 0) {
+        if (isLastToAct) {
+          return lowestCard(aboveWin);
+        }
+        const bossAboveWin = aboveWin.filter((card) => unseenHigherCount(card, memory) === 0);
+        return bossAboveWin.length > 0 ? lowestCard(bossAboveWin) : highestCard(aboveWin);
+      }
 
       if (hasJackDiamonds && !trickHasPoints && aboveWin.length > 0) {
         return lowestCard(aboveWin);
@@ -107,7 +134,7 @@ export class CardSharkStrategy implements AiStrategy {
         if (bossCards.length > 0) {
           return lowestCard(bossCards);
         }
-        return lowestCard(following);
+        return lowestCard(keepJackDiamondsIfPossible(following, state.rules));
       }
 
       if (isLastToAct && aboveWin.length > 0) {
@@ -133,7 +160,7 @@ export class CardSharkStrategy implements AiStrategy {
       if (bossCards.length > 0 && !isLastToAct) {
         return lowestCard(bossCards);
       }
-      return lowestCard(following);
+      return lowestCard(keepJackDiamondsIfPossible(following, state.rules));
     }
 
     const points = legalCards.filter((card) => scoreCard(card, rules) > 0);
@@ -170,8 +197,17 @@ export class CardSharkStrategy implements AiStrategy {
       return lowestCard(legalCards);
     }
 
+    const jackDiamonds = legalCards.find((card) => isJackDiamondsBonus(card, state.rules));
+    if (
+      jackDiamonds &&
+      unseenHigherCount(jackDiamonds, memory) === 0 &&
+      opponentsVoidCount(memory, 'diamonds') === 0
+    ) {
+      return jackDiamonds;
+    }
+
     const safe = legalCards.filter((card) => scoreCard(card, state.rules) <= 0);
-    const baseCandidates = safe.length > 0 ? safe : legalCards;
+    const baseCandidates = keepJackDiamondsIfPossible(safe.length > 0 ? safe : legalCards, state.rules);
     const candidates = avoidRiskyHighSpadeLeads(baseCandidates, player.hand, memory);
     const handSize = player.hand.length;
 
@@ -466,6 +502,10 @@ const countBySuit = (cards: Card[]): Record<Card['suit'], number> => {
   }
   return counts;
 };
+
+/** Net score of the cards already on the table; negative means the trick is worth winning. */
+const trickValue = (trick: GameState['trick']['cards'], rules: GameRules): number =>
+  trick.reduce((total, play) => total + scoreCard(play.card, rules), 0);
 
 const isJackDiamondsBonus = (card: Card, rules: { jackOfDiamondsMinus10: boolean }): boolean =>
   rules.jackOfDiamondsMinus10 && card.suit === 'diamonds' && card.rank === 'J';
