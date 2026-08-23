@@ -1,5 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { BUILD_DATE } from '../../build-info';
 import { GameStateService } from '../../game/services/game-state.service';
 import { ThemeService } from '../../theme.service';
 
@@ -20,6 +21,7 @@ export class HomePageComponent {
   readonly jackOfDiamondsMinus10 = signal(false);
   readonly debugAiHistory = signal(true);
   readonly themes = this.themeService.options;
+  readonly buildDate = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' }).format(new Date(BUILD_DATE));
   readonly selectedTheme = this.themeService.theme;
 
   constructor() {

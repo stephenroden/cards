@@ -17,6 +17,13 @@
   margin: 0 0 6px;
 }
 
+.build-date {
+  margin: 0 0 10px;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  opacity: 0.75;
+}
+
 .home-card > p {
   margin: 0 0 16px;
   color: var(--text-muted);
