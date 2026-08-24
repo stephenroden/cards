@@ -1,4 +1,5 @@
 import { Card, Suit } from '../cards/card.models';
+import { AuctionCall } from './services/bridge-auction';
 
 /** Seats run clockwise from north; the human always sits south. */
 export type Seat = 'north' | 'east' | 'south' | 'west';
@@ -11,7 +12,7 @@ export type Risk = 'none' | 'doubled' | 'redoubled';
 
 export type Vulnerability = 'none' | 'ns' | 'ew' | 'both';
 
-export type BridgePhase = 'contract' | 'play' | 'deal-summary' | 'session-over';
+export type BridgePhase = 'auction' | 'play' | 'deal-summary' | 'session-over';
 
 export interface Contract {
   level: number;
@@ -44,6 +45,8 @@ export interface DealResult {
 
 export interface BridgeState {
   phase: BridgePhase;
+  /** Calls made so far this deal, in order, starting with the dealer. */
+  auction: AuctionCall[];
   dealNumber: number;
   dealer: Seat;
   vulnerability: Vulnerability;

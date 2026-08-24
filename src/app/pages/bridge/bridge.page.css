@@ -445,3 +445,114 @@ button.primary {
     --mini-w: clamp(15px, 3.4vh, 22px);
   }
 }
+
+/* Auction ---------------------------------------------------------------- */
+
+.auction-pane {
+  min-height: 0;
+  display: grid;
+  gap: clamp(6px, 1.4vh, 14px);
+  justify-items: center;
+  align-content: center;
+  overflow-y: auto;
+}
+
+.auction-log {
+  width: min(100%, 300px);
+  background: var(--br-panel);
+  border-radius: 12px;
+  padding: 6px 8px;
+}
+
+.auction-head,
+.auction-cells {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2px;
+  text-align: center;
+}
+
+.auction-head span {
+  font-size: 0.58rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--br-subtle);
+  padding-bottom: 2px;
+}
+
+.auction-head span.dealer {
+  color: var(--accent-primary);
+  font-weight: 700;
+}
+
+.auction-cell {
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 1px 0;
+  min-height: 1.1em;
+}
+
+.auction-cell.empty {
+  opacity: 0.25;
+}
+
+/* The classic bidding box: seven levels down, five strains across. */
+.bidding-box {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 3px;
+  width: min(100%, 300px);
+}
+
+.bid-cell {
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  min-height: 32px;
+  padding: 0;
+  border-radius: 6px;
+  border: 1px solid var(--br-border);
+  background: var(--br-panel);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.bid-cell.red {
+  color: #ff9c92;
+}
+
+.bid-cell:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+}
+
+.bid-cell:not(:disabled):hover {
+  background: color-mix(in srgb, var(--accent-primary) 30%, var(--br-panel));
+}
+
+.call-row {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+}
+
+.call-btn {
+  font: inherit;
+  font-weight: 600;
+  min-height: 40px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1px solid var(--br-border);
+  background: var(--br-panel);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.call-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.auction-hand .hand-card {
+  display: inline-block;
+}

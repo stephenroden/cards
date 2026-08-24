@@ -1,19 +1,20 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, effect, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Card } from '../../cards/card.models';
 import {
   BridgePlayer,
   Contract,
   DEALS_PER_SESSION,
+  SEAT_ORDER,
   STRAINS,
   Seat,
   Strain,
   partnerOf,
   partnershipOf
 } from '../../bridge/bridge.models';
+import { Call } from '../../bridge/services/bridge-auction';
 import { BridgeEngineService } from '../../bridge/services/bridge-engine.service';
 import { BridgeStateService } from '../../bridge/services/bridge-state.service';
-import { suggestContract } from '../../bridge/services/bridge-deal';
 import { RANK_VALUE } from '../../bridge/services/bridge-rules';
 import { cardImage } from '../../poker/services/poker-utils';
 
@@ -45,12 +46,48 @@ export class BridgePageComponent {
 
   readonly state = this.bridgeState.state;
 
-  private readonly draft = computed<Contract>(() => suggestContract(this.handsBySeat()));
-  private chosen: Contract | null = null;
+  constructor() {
+    // The seats before south have to call before the player sees a live bidding box.
+    effect(() => {
+      const state = this.state();
+      if (state.phase === 'auction' && state.auction.length === 0) {
+        this.engine.openAuction();
+      }
+    });
+  }
 
-  readonly contractDraft = computed<Contract>(() => this.chosen ?? this.draft());
+  readonly seats = SEAT_ORDER;
+
+  readonly myTurnToCall = computed(() => {
+    const state = this.state();
+    return state.phase === 'auction' && this.engine.seatToCall(state) === 'south';
+  });
+
+  /** The auction laid out in dealer order, padded so each row is one round of four. */
+  readonly auctionGrid = computed(() => {
+    const state = this.state();
+    const cells: Array<string | null> = Array(SEAT_ORDER.indexOf(state.dealer)).fill(null);
+    for (const entry of state.auction) {
+      cells.push(this.callLabel(entry.call));
+    }
+    while (cells.length % 4 !== 0) {
+      cells.push(null);
+    }
+    return cells;
+  });
 
   readonly dummy = computed(() => this.engine.dummySeat(this.state()));
+
+  /** North's cards are face up when it is the exposed dummy, or when the player is running it. */
+  readonly showNorthCards = computed(() => {
+    const state = this.state();
+    if (state.phase !== 'play') {
+      return false;
+    }
+    return this.engine.humanControls(state, 'north') || (this.dummy() === 'north' && state.dummyRevealed);
+  });
+
+  readonly northHand = computed(() => (this.showNorthCards() ? this.sortedHand('north') : []));
 
   readonly legalNow = computed(() => {
     const state = this.state();
@@ -153,21 +190,45 @@ export class BridgePageComponent {
     return map[this.state().vulnerability];
   }
 
-  setLevel(level: number): void {
-    this.chosen = { ...this.contractDraft(), level };
+  engineSeatToCall(): Seat {
+    return this.engine.seatToCall(this.state());
   }
 
-  setStrain(strain: Strain): void {
-    this.chosen = { ...this.contractDraft(), strain };
+  callLabel(call: Call): string {
+    if (call.type === 'pass') {
+      return 'Pass';
+    }
+    if (call.type === 'double') {
+      return 'X';
+    }
+    if (call.type === 'redouble') {
+      return 'XX';
+    }
+    return `${call.level}${STRAIN_LABELS[call.strain]}`;
   }
 
-  setDeclarer(declarer: Seat): void {
-    this.chosen = { ...this.contractDraft(), declarer };
+  canCall(call: Call): boolean {
+    return this.myTurnToCall() && this.engine.isLegalCall(this.state(), call);
   }
 
-  playContract(): void {
-    this.engine.setContract(this.contractDraft());
-    this.chosen = null;
+  canBid(level: number, strain: Strain): boolean {
+    return this.canCall({ type: 'bid', level, strain });
+  }
+
+  bid(level: number, strain: Strain): void {
+    this.engine.makeCall({ type: 'bid', level, strain });
+  }
+
+  callPass(): void {
+    this.engine.makeCall({ type: 'pass' });
+  }
+
+  callDouble(): void {
+    this.engine.makeCall({ type: 'double' });
+  }
+
+  callRedouble(): void {
+    this.engine.makeCall({ type: 'redouble' });
   }
 
   play(card: Card): void {
@@ -180,12 +241,10 @@ export class BridgePageComponent {
 
   nextDeal(): void {
     this.engine.nextDeal();
-    this.chosen = null;
   }
 
   newSession(): void {
     this.engine.startSession();
-    this.chosen = null;
   }
 
   partnerSeat(seat: Seat): Seat {

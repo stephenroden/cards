@@ -23,7 +23,8 @@ export const buildPlayers = (hands: Record<Seat, Card[]>): BridgePlayer[] =>
   }));
 
 export const initialBridgeState = (dealNumber = 1): BridgeState => ({
-  phase: 'contract',
+  phase: 'auction',
+  auction: [],
   dealNumber,
   dealer: dealerForDeal(dealNumber),
   vulnerability: vulnerabilityForDeal(dealNumber),
@@ -39,7 +40,7 @@ export const initialBridgeState = (dealNumber = 1): BridgeState => ({
   dummyRevealed: false,
   scores: { ns: 0, ew: 0 },
   history: [],
-  message: 'Choose a contract to play.'
+  message: 'The auction is open.'
 });
 
 const isCard = (value: unknown): value is Card => {
@@ -74,6 +75,7 @@ const isBridgeState = (value: unknown): value is BridgeState => {
     candidate.dealNumber >= 1 &&
     candidate.dealNumber <= DEALS_PER_SESSION &&
     typeof candidate.turn === 'string' &&
+    Array.isArray(candidate.auction) &&
     typeof candidate.dummyRevealed === 'boolean' &&
     Array.isArray(candidate.players) &&
     candidate.players.length === 4 &&

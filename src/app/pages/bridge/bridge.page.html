@@ -27,50 +27,52 @@
     </div>
   </header>
 
-  @if (state().phase === 'contract') {
-    <section class="contract-picker">
-      <p class="picker-hint">No auction yet &mdash; choose the contract to play.</p>
-
-      <div class="picker-row">
-        <span class="picker-label">Level</span>
-        <div class="picker-options">
-          @for (level of levels; track level) {
-            <button type="button" [class.selected]="contractDraft().level === level" (click)="setLevel(level)">
-              {{ level }}
-            </button>
+  @if (state().phase === 'auction') {
+    <section class="auction-pane">
+      <div class="auction-log">
+        <div class="auction-head">
+          @for (seat of seats; track seat) {
+            <span [class.dealer]="state().dealer === seat">{{ seatName(seat) }}</span>
+          }
+        </div>
+        <div class="auction-cells">
+          @for (cell of auctionGrid(); track $index) {
+            <span class="auction-cell" [class.empty]="cell === null">{{ cell ?? '' }}</span>
           }
         </div>
       </div>
 
-      <div class="picker-row">
-        <span class="picker-label">Strain</span>
-        <div class="picker-options">
+      <p class="picker-hint">
+        {{ myTurnToCall() ? 'Your call.' : seatName(engineSeatToCall()) + ' is thinking.' }}
+      </p>
+
+      <div class="bidding-box">
+        @for (level of levels; track level) {
           @for (strain of strains; track strain) {
             <button
               type="button"
-              [class.selected]="contractDraft().strain === strain"
+              class="bid-cell"
               [class.red]="isRedStrain(strain)"
-              (click)="setStrain(strain)"
+              [disabled]="!canBid(level, strain)"
+              (click)="bid(level, strain)"
             >
-              {{ strainLabel(strain) }}
+              {{ level }}{{ strainLabel(strain) }}
             </button>
           }
-        </div>
+        }
       </div>
 
-      <div class="picker-row">
-        <span class="picker-label">Declarer</span>
-        <div class="picker-options">
-          @for (seat of declarerChoices; track seat) {
-            <button type="button" [class.selected]="contractDraft().declarer === seat" (click)="setDeclarer(seat)">
-              {{ seatName(seat) }}
-            </button>
-          }
-        </div>
+      <div class="call-row">
+        <button type="button" class="call-btn" [disabled]="!canCall({ type: 'pass' })" (click)="callPass()">Pass</button>
+        <button type="button" class="call-btn" [disabled]="!canCall({ type: 'double' })" (click)="callDouble()">Double</button>
+        <button type="button" class="call-btn" [disabled]="!canCall({ type: 'redouble' })" (click)="callRedouble()">Redouble</button>
       </div>
 
-      <p class="picker-summary">{{ describeContract(contractDraft()) }}</p>
-      <button type="button" class="primary" (click)="playContract()">Play This Contract</button>
+      <div class="south-hand auction-hand">
+        @for (card of southHand(); track card.suit + card.rank) {
+          <span class="hand-card"><img [src]="cardImage(card)" [alt]="card.rank + ' of ' + card.suit" /></span>
+        }
+      </div>
     </section>
   } @else if (state().phase === 'session-over') {
     <section class="contract-picker">
@@ -82,9 +84,9 @@
     <section class="table-stage" [class.awaiting]="state().trickComplete" (click)="acknowledgeTrick()">
       <div class="seat-strip north">
         <span class="seat-tag">{{ seatName('north') }}{{ dummy() === 'north' ? ' (dummy)' : '' }}</span>
-        @if (dummy() === 'north' && state().dummyRevealed) {
+        @if (showNorthCards()) {
           <div class="dummy-hand">
-            @for (card of dummyHand(); track card.suit + card.rank) {
+            @for (card of northHand(); track card.suit + card.rank) {
               <button
                 type="button"
                 class="mini-card"

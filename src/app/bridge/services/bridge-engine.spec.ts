@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { Card } from '../../cards/card.models';
-import { BridgeState, Contract, Seat } from '../bridge.models';
+import { BridgeState, Contract, Seat, nextSeat } from '../bridge.models';
 import { BridgeEngineService } from './bridge-engine.service';
 import { BridgeStateService, initialBridgeState } from './bridge-state.service';
 import { buildDeck, dealHands } from './bridge-deal';
@@ -62,6 +62,15 @@ describe('BridgeEngineService', () => {
     engine.setContract(contract({ declarer: 'south' }));
     expect(engine.humanControls(current(), 'north')).toBe(true);
     expect(engine.humanControls(current(), 'east')).toBe(false);
+  });
+
+  it('lets the player run both hands when partner wins the contract', () => {
+    // The auction can make north declarer, which would otherwise leave the player as dummy.
+    engine.setContract(contract({ declarer: 'north' }));
+    expect(engine.humanControls(current(), 'north')).toBe(true);
+    expect(engine.humanControls(current(), 'south')).toBe(true);
+    expect(engine.humanControls(current(), 'west')).toBe(false);
+    expect(engine.dummySeat(current())).toBe('south');
   });
 
   it('leaves the player defending when the opponents declare', () => {
@@ -145,6 +154,113 @@ describe('BridgeEngineService', () => {
       engine.nextDeal();
     }
     expect(seen).toEqual(['none', 'ns', 'ew', 'both']);
+  });
+
+  describe('auction', () => {
+    /** Passes for south until the table settles on a contract. */
+    const settle = (limit = 40): void => {
+      engine.openAuction();
+      for (let step = 0; step < limit && current().phase === 'auction'; step += 1) {
+        if (current().auction.length === 0) {
+          engine.openAuction();
+          continue;
+        }
+        engine.makeCall({ type: 'pass' });
+      }
+    };
+
+    it('starts on the auction rather than a contract picker', () => {
+      expect(current().phase).toBe('auction');
+      expect(current().auction).toEqual([]);
+      expect(current().contract).toBeNull();
+    });
+
+    it('runs the CPU seats up to the player turn to call', () => {
+      engine.openAuction();
+      const state = current();
+      if (state.phase === 'auction') {
+        // Everyone before south has called, and south is now on turn.
+        expect(engine.seatToCall(state)).toBe('south');
+        expect(state.auction.every((entry) => entry.seat !== 'south')).toBe(true);
+      }
+    });
+
+    /** North deals and has opened, so south is on turn with a live bid to act over. */
+    const southOnTurn = (): void => {
+      state.setState({
+        ...initialBridgeState(1),
+        auction: [
+          { seat: 'north', call: { type: 'bid', level: 1, strain: 'spades' } },
+          { seat: 'east', call: { type: 'pass' } }
+        ]
+      });
+    };
+
+    it('records the player call and carries the auction on', () => {
+      southOnTurn();
+      expect(engine.seatToCall(current())).toBe('south');
+
+      engine.makeCall({ type: 'pass' });
+      expect(current().auction.some((entry) => entry.seat === 'south')).toBe(true);
+    });
+
+    it('refuses a call that is not legal', () => {
+      southOnTurn();
+      const before = current().auction.length;
+      // A redouble with no double standing is never legal.
+      engine.makeCall({ type: 'redouble' });
+      expect(current().auction.length).toBe(before);
+
+      // Nor is a bid that does not outrank the standing one.
+      engine.makeCall({ type: 'bid', level: 1, strain: 'clubs' });
+      expect(current().auction.length).toBe(before);
+    });
+
+    it('accepts a legal raise from the player', () => {
+      southOnTurn();
+      engine.makeCall({ type: 'bid', level: 2, strain: 'spades' });
+      expect(current().auction.some((entry) => entry.seat === 'south' && entry.call.type === 'bid')).toBe(true);
+    });
+
+    it('settles on a contract and opens play with the lead already made', () => {
+      settle();
+      expect(current().phase).toBe('play');
+      const contract = current().contract;
+      expect(contract).not.toBeNull();
+      expect(contract!.level).toBeGreaterThanOrEqual(1);
+      // The opening lead is on the table by the time control returns.
+      expect(current().trick.leader).toBe(nextSeat(contract!.declarer));
+      expect(current().dummyRevealed).toBe(true);
+    });
+
+    it('plays a full deal through the auction with no contract picked by hand', () => {
+      settle();
+      playOutDeal();
+      expect(current().phase).toBe('deal-summary');
+      expect(current().history).toHaveLength(1);
+      expect(current().completedTricks).toBe(13);
+    });
+
+    it('redeals a hand nobody bids', () => {
+      // Four passes leaves no contract, so the same dealer deals again.
+      // Deal 4 is dealt by west, so south is the fourth and final caller.
+      state.setState({
+        ...initialBridgeState(4),
+        auction: [
+          { seat: 'west', call: { type: 'pass' } },
+          { seat: 'north', call: { type: 'pass' } },
+          { seat: 'east', call: { type: 'pass' } }
+        ]
+      });
+      const before = current().players.map((player) => player.hand.length);
+      engine.makeCall({ type: 'pass' });
+
+      expect(before).toEqual([13, 13, 13, 13]);
+      expect(current().phase).toBe('auction');
+      expect(current().dealNumber).toBe(4);
+      expect(current().auction).toEqual([]);
+      expect(current().message).toContain('Passed out');
+    });
   });
 
   it('ignores plays that are not the player to act', () => {

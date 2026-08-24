@@ -12,6 +12,16 @@ import {
   vulnerabilityForDeal
 } from '../bridge.models';
 import { dealHands } from './bridge-deal';
+import {
+  AuctionCall,
+  Call,
+  auctionIsComplete,
+  finalContract,
+  isLegalCall,
+  isPassedOut,
+  seatToCall
+} from './bridge-auction';
+import { chooseCall } from './bridge-bidding-ai';
 import { isLegalPlay, openingLeader, trickWinner } from './bridge-rules';
 import { chooseBridgeCard } from './bridge-play-ai';
 import { scoreDeal } from './bridge-scoring';
@@ -29,12 +39,18 @@ export class BridgeEngineService {
     this.bridgeState.resetSession();
   }
 
-  /** South plays their own cards, plus dummy's whenever South is the declarer. */
+  /**
+   * South always plays their own cards. When north/south win the contract the player runs
+   * both hands, whichever of the two the auction made declarer, so they never sit out as dummy.
+   */
   humanControls(state: BridgeState, seat: Seat): boolean {
     if (seat === 'south') {
       return true;
     }
-    return state.contract?.declarer === 'south' && seat === partnerOf('south') && state.dummyRevealed;
+    if (seat !== partnerOf('south') || !state.contract) {
+      return false;
+    }
+    return partnershipOf(state.contract.declarer) === partnershipOf('south');
   }
 
   handOf(state: BridgeState, seat: Seat): Card[] {
@@ -45,22 +61,89 @@ export class BridgeEngineService {
     return state.contract ? partnerOf(state.contract.declarer) : null;
   }
 
-  setContract(contract: Contract): void {
+  /** The seat whose turn it is to call. */
+  seatToCall(state: BridgeState): Seat {
+    return seatToCall(state.dealer, state.auction);
+  }
+
+  isLegalCall(state: BridgeState, call: Call): boolean {
+    return state.phase === 'auction' && isLegalCall(state.auction, this.seatToCall(state), call);
+  }
+
+  makeCall(call: Call): void {
     const state = this.bridgeState.state();
-    if (state.phase !== 'contract') {
+    if (state.phase !== 'auction' || this.seatToCall(state) !== 'south') {
       return;
     }
+    if (!isLegalCall(state.auction, 'south', call)) {
+      return;
+    }
+    this.bridgeState.setState(this.advanceAuction(this.applyCall(state, 'south', call)));
+  }
+
+  private applyCall(state: BridgeState, seat: Seat, call: Call): BridgeState {
+    return { ...state, auction: [...state.auction, { seat, call }] };
+  }
+
+  /** Runs the CPU seats through the auction, then opens play on whatever they settled. */
+  private advanceAuction(state: BridgeState): BridgeState {
+    let current = state;
+    let guard = 0;
+    while (!auctionIsComplete(current.auction) && guard < 80) {
+      const seat = seatToCall(current.dealer, current.auction);
+      if (seat === 'south') {
+        return { ...current, message: '' };
+      }
+      guard += 1;
+      current = this.applyCall(current, seat, chooseCall({ seat, hand: this.handOf(current, seat), calls: current.auction }));
+    }
+
+    if (isPassedOut(current.auction)) {
+      return this.redeal(current);
+    }
+
+    const contract = finalContract(current.auction);
+    return contract ? this.beginPlay(current, contract) : this.redeal(current);
+  }
+
+  /** Opens play on a settled contract, running the CPU seats up to the player's first turn. */
+  setContract(contract: Contract): void {
+    const state = this.bridgeState.state();
+    if (state.phase !== 'auction' && state.phase !== 'play') {
+      return;
+    }
+    this.bridgeState.setState(this.beginPlay(state, contract));
+  }
+
+  private beginPlay(state: BridgeState, contract: Contract): BridgeState {
     const leader = openingLeader(contract.declarer);
-    this.bridgeState.setState(
-      this.advance({
-        ...state,
-        contract,
-        phase: 'play',
-        turn: leader,
-        trick: { leader, cards: [] },
-        message: ''
-      })
-    );
+    return this.advance({
+      ...state,
+      contract,
+      phase: 'play',
+      turn: leader,
+      trick: { leader, cards: [] },
+      message: ''
+    });
+  }
+
+  /** Nobody wanted the hand, so the same dealer deals again. */
+  private redeal(state: BridgeState): BridgeState {
+    return {
+      ...initialBridgeState(state.dealNumber),
+      scores: state.scores,
+      history: state.history,
+      message: 'Passed out. Redealing.'
+    };
+  }
+
+  /** Kicks the auction off when the deal is fresh and nobody has called yet. */
+  openAuction(): void {
+    const state = this.bridgeState.state();
+    if (state.phase !== 'auction' || state.auction.length > 0) {
+      return;
+    }
+    this.bridgeState.setState(this.advanceAuction(state));
   }
 
   legalPlaysFor(state: BridgeState, seat: Seat): Card[] {
