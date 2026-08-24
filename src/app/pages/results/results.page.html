@@ -83,10 +83,10 @@
             <span class="player-name">{{ player.name }}</span>
             <span
               class="num chip-delta"
-              [class.positive]="(poker().lastHandNet[player.id] ?? 0) > 0"
-              [class.negative]="(poker().lastHandNet[player.id] ?? 0) < 0"
+              [class.positive]="pokerNet(player.id) > 0"
+              [class.negative]="pokerNet(player.id) < 0"
             >
-              {{ formatChipDelta(poker().lastHandNet[player.id] ?? 0) }}
+              {{ formatChipDelta(pokerNet(player.id)) }}
             </span>
             <span class="num">{{ player.stack }}</span>
             <span class="num">{{ player.eliminated ? 'Out' : 'In' }}</span>

@@ -50,7 +50,7 @@ export interface PokerState {
   actionHistory: PokerAction[];
   sidePots: SidePot[];
   winners: string[];
-  lastHandNet: Record<string, number>;
+  lastHandNet: Partial<Record<string, number>>;
   revealCpuCards: boolean;
   message: string;
   sessionOver: boolean;

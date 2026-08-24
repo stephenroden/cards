@@ -136,6 +136,10 @@ export class ResultsPageComponent {
     }
     return `${amount}`;
   }
+
+  pokerNet(playerId: string): number {
+    return this.poker().lastHandNet[playerId] ?? 0;
+  }
 }
 
 const GAME_END_SCORE = 100;
