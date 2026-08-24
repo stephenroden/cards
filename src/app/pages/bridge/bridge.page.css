@@ -1,0 +1,447 @@
+:host {
+  display: block;
+  height: 100dvh;
+  overflow: hidden;
+  --card-w: clamp(44px, 13vw, 58px);
+  --mini-w: clamp(18px, 5vw, 28px);
+  --br-panel: color-mix(in srgb, var(--surface-strong) 78%, transparent);
+  --br-border: color-mix(in srgb, var(--border-soft) 70%, transparent);
+  --br-subtle: color-mix(in srgb, var(--text-primary) 60%, transparent);
+  --br-felt-core: color-mix(in srgb, var(--surface-strong) 72%, #0c2719 28%);
+  --br-felt-edge: color-mix(in srgb, var(--surface-strong) 84%, #020705 16%);
+  --br-glow: color-mix(in srgb, var(--accent-primary) 24%, transparent);
+}
+
+.bridge-shell {
+  height: 100%;
+  padding: clamp(8px, 1.2vh, 12px);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: clamp(6px, 1vh, 12px);
+  color: var(--text-primary);
+  background:
+    radial-gradient(circle at 50% 18%, var(--br-glow), transparent 28%),
+    radial-gradient(circle at 50% 55%, var(--br-felt-core), var(--br-felt-edge));
+  border-radius: 28px;
+  overflow: hidden;
+}
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-title h1 {
+  margin: 0;
+  font-size: clamp(1rem, 2.4vw, 1.35rem);
+  letter-spacing: 0.04em;
+}
+
+.header-stats {
+  display: flex;
+  gap: 6px;
+}
+
+.summary-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 12px;
+  background: var(--br-panel);
+  min-width: 46px;
+}
+
+.summary-chip .label {
+  font-size: 0.55rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--br-subtle);
+}
+
+.summary-chip strong {
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+.menu-trigger {
+  list-style: none;
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  border: 0;
+  background: transparent;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.menu-trigger::-webkit-details-marker {
+  display: none;
+}
+
+.table-actions-menu {
+  position: relative;
+}
+
+.menu-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  min-width: 132px;
+  border-radius: 12px;
+  padding: 6px;
+  background: color-mix(in srgb, var(--surface-strong) 96%, transparent);
+  border: 1px solid var(--br-border);
+}
+
+.menu-panel a {
+  padding: 8px 10px;
+  border-radius: 8px;
+  color: var(--text-primary);
+  text-decoration: none;
+  font-size: 0.85rem;
+}
+
+/* Contract picker ------------------------------------------------------- */
+
+.contract-picker {
+  align-self: center;
+  display: grid;
+  gap: clamp(8px, 1.6vh, 16px);
+  justify-items: center;
+  padding: clamp(12px, 2vh, 20px);
+}
+
+.picker-hint {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--br-subtle);
+  text-align: center;
+}
+
+.picker-row {
+  display: grid;
+  gap: 4px;
+  justify-items: center;
+  width: 100%;
+}
+
+.picker-label {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--br-subtle);
+}
+
+.picker-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+}
+
+.picker-options button {
+  min-width: 40px;
+  min-height: 40px;
+  padding: 0 10px;
+  border-radius: 10px;
+  border: 1px solid var(--br-border);
+  background: var(--br-panel);
+  color: var(--text-primary);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.picker-options button.red {
+  color: #ff9c92;
+}
+
+.picker-options button.selected {
+  background: var(--accent-primary);
+  color: var(--accent-on-primary);
+  border-color: transparent;
+}
+
+.picker-summary {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+/* Table ----------------------------------------------------------------- */
+
+.table-stage {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(58px, auto) minmax(0, 1fr) minmax(58px, auto);
+  grid-template-rows: auto auto;
+  align-content: center;
+  align-items: center;
+  justify-items: center;
+  gap: clamp(8px, 2.5vh, 26px);
+}
+
+.table-stage.awaiting {
+  cursor: pointer;
+}
+
+.seat-strip {
+  display: grid;
+  gap: 3px;
+  justify-items: center;
+  min-width: 0;
+}
+
+.seat-strip.north {
+  grid-column: 1 / -1;
+  grid-row: 1;
+}
+
+.seat-strip.west {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.seat-strip.east {
+  grid-column: 3;
+  grid-row: 2;
+}
+
+.seat-tag {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--br-subtle);
+  white-space: nowrap;
+}
+
+.card-backs {
+  display: flex;
+  gap: 1px;
+}
+
+.back {
+  width: 7px;
+  height: 20px;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--accent-on-primary) 34%, #27314f 66%);
+}
+
+.count {
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.dummy-hand {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1px;
+  max-width: 100%;
+}
+
+.dummy-hand.side {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  gap: 1px;
+  justify-content: center;
+}
+
+.mini-card {
+  padding: 0;
+  border: 0;
+  background: none;
+  border-radius: 3px;
+  cursor: default;
+  line-height: 0;
+}
+
+.mini-card img,
+.mini-img {
+  width: var(--mini-w);
+  aspect-ratio: 5 / 7;
+  border-radius: 3px;
+  display: block;
+}
+
+.mini-card:disabled img {
+  opacity: 0.55;
+}
+
+.mini-card.playable {
+  cursor: pointer;
+  outline: 2px solid var(--accent-primary);
+  outline-offset: -1px;
+}
+
+.trick-area {
+  grid-column: 2;
+  grid-row: 2;
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: min(100%, 236px);
+  aspect-ratio: 1;
+  max-height: 100%;
+}
+
+.trick-card img {
+  width: var(--card-w);
+  aspect-ratio: 5 / 7;
+  border-radius: 6px;
+  display: block;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.4);
+}
+
+/* Each card sits toward the seat that played it. */
+.trick-card {
+  position: absolute;
+}
+
+.trick-card.from-north {
+  top: 0;
+}
+
+.trick-card.from-south {
+  bottom: 0;
+}
+
+.trick-card.from-west {
+  left: 0;
+}
+
+.trick-card.from-east {
+  right: 0;
+}
+
+.trick-empty {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--br-subtle);
+  text-align: center;
+  padding: 0 8px;
+}
+
+/* Player dock ----------------------------------------------------------- */
+
+.player-dock {
+  display: grid;
+  gap: 6px;
+  justify-items: center;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.dock-status {
+  display: flex;
+  gap: 12px;
+  font-size: 0.72rem;
+  color: var(--br-subtle);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.dock-status .tricks {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.south-hand {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  padding: 0 4px;
+}
+
+.hand-card {
+  padding: 0;
+  border: 0;
+  background: none;
+  line-height: 0;
+  margin-left: calc(var(--card-w) * -0.52);
+  transition: transform 120ms ease;
+  cursor: default;
+}
+
+.hand-card:first-child {
+  margin-left: 0;
+}
+
+.hand-card img {
+  width: var(--card-w);
+  aspect-ratio: 5 / 7;
+  border-radius: 5px;
+  display: block;
+  box-shadow: -2px 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+.hand-card:disabled img {
+  opacity: 0.5;
+}
+
+.hand-card.playable {
+  cursor: pointer;
+}
+
+.hand-card.playable img {
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--accent-primary) 85%, transparent),
+    -2px 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+.hand-card.playable:hover,
+.hand-card.playable:focus-visible {
+  transform: translateY(-10px);
+  outline: none;
+}
+
+.summary-actions {
+  display: grid;
+  gap: 6px;
+  justify-items: center;
+}
+
+.deal-result {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.deal-score {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--br-subtle);
+}
+
+button.primary {
+  font: inherit;
+  cursor: pointer;
+  border-radius: 999px;
+  padding: 10px 20px;
+  min-height: 44px;
+  border: 0;
+  background: var(--accent-primary);
+  color: var(--accent-on-primary);
+  font-weight: 600;
+}
+
+@media (max-height: 700px) {
+  :host {
+    --card-w: clamp(32px, 8vh, 48px);
+    --mini-w: clamp(15px, 3.4vh, 22px);
+  }
+}

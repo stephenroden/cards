@@ -1,4 +1,4 @@
-export const GAME_IDS = ['hearts', 'poker', 'blackjack'] as const;
+export const GAME_IDS = ['hearts', 'poker', 'blackjack', 'bridge'] as const;
 
 export type GameId = (typeof GAME_IDS)[number];
 

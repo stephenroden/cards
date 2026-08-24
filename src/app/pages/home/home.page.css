@@ -104,6 +104,10 @@
   background: linear-gradient(160deg, color-mix(in srgb, var(--surface-strong) 85%, #0d3f20 15%), var(--surface-strong));
 }
 
+.bridge-tile {
+  background: linear-gradient(160deg, color-mix(in srgb, var(--surface-strong) 85%, #1d2a52 15%), var(--surface-strong));
+}
+
 @media (max-width: 760px) {
   .pack-grid {
     grid-template-columns: 1fr;

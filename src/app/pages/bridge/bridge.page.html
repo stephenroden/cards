@@ -1,0 +1,180 @@
+<section class="bridge-shell">
+  <header class="table-header">
+    <div class="header-title">
+      <details class="table-actions-menu">
+        <summary class="menu-trigger" aria-label="Open bridge actions">☰</summary>
+        <nav class="menu-panel">
+          <a routerLink="/results/bridge">Results</a>
+          <a routerLink="/rules/bridge">Rules</a>
+          <a routerLink="/">Exit</a>
+        </nav>
+      </details>
+      <h1>Bridge</h1>
+    </div>
+    <div class="header-stats">
+      <div class="summary-chip">
+        <span class="label">Deal</span>
+        <strong>{{ state().dealNumber }}/{{ dealsPerSession }}</strong>
+      </div>
+      <div class="summary-chip">
+        <span class="label">Vuln</span>
+        <strong>{{ vulnerableLabel() }}</strong>
+      </div>
+      <div class="summary-chip">
+        <span class="label">Contract</span>
+        <strong>{{ contractLabel() }}</strong>
+      </div>
+    </div>
+  </header>
+
+  @if (state().phase === 'contract') {
+    <section class="contract-picker">
+      <p class="picker-hint">No auction yet &mdash; choose the contract to play.</p>
+
+      <div class="picker-row">
+        <span class="picker-label">Level</span>
+        <div class="picker-options">
+          @for (level of levels; track level) {
+            <button type="button" [class.selected]="contractDraft().level === level" (click)="setLevel(level)">
+              {{ level }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="picker-row">
+        <span class="picker-label">Strain</span>
+        <div class="picker-options">
+          @for (strain of strains; track strain) {
+            <button
+              type="button"
+              [class.selected]="contractDraft().strain === strain"
+              [class.red]="isRedStrain(strain)"
+              (click)="setStrain(strain)"
+            >
+              {{ strainLabel(strain) }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="picker-row">
+        <span class="picker-label">Declarer</span>
+        <div class="picker-options">
+          @for (seat of declarerChoices; track seat) {
+            <button type="button" [class.selected]="contractDraft().declarer === seat" (click)="setDeclarer(seat)">
+              {{ seatName(seat) }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <p class="picker-summary">{{ describeContract(contractDraft()) }}</p>
+      <button type="button" class="primary" (click)="playContract()">Play This Contract</button>
+    </section>
+  } @else if (state().phase === 'session-over') {
+    <section class="contract-picker">
+      <p class="picker-summary">Session complete.</p>
+      <p class="picker-hint">N/S {{ state().scores.ns }} &mdash; E/W {{ state().scores.ew }}</p>
+      <button type="button" class="primary" (click)="newSession()">New Session</button>
+    </section>
+  } @else {
+    <section class="table-stage" [class.awaiting]="state().trickComplete" (click)="acknowledgeTrick()">
+      <div class="seat-strip north">
+        <span class="seat-tag">{{ seatName('north') }}{{ dummy() === 'north' ? ' (dummy)' : '' }}</span>
+        @if (dummy() === 'north' && state().dummyRevealed) {
+          <div class="dummy-hand">
+            @for (card of dummyHand(); track card.suit + card.rank) {
+              <button
+                type="button"
+                class="mini-card"
+                [class.playable]="isPlayable(card, 'north')"
+                [disabled]="!isPlayable(card, 'north')"
+                (click)="play(card)"
+              >
+                <img [src]="cardImage(card)" [alt]="card.rank + ' of ' + card.suit" />
+              </button>
+            }
+          </div>
+        } @else {
+          <div class="card-backs">
+            @for (slot of [].constructor(handCount('north')); track $index) {
+              <span class="back"></span>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="seat-strip west">
+        <span class="seat-tag">{{ seatName('west') }}{{ dummy() === 'west' ? ' (dummy)' : '' }}</span>
+        @if (dummy() === 'west' && state().dummyRevealed) {
+          <div class="dummy-hand side">
+            @for (card of dummyHand(); track card.suit + card.rank) {
+              <img class="mini-img" [src]="cardImage(card)" [alt]="card.rank + ' of ' + card.suit" />
+            }
+          </div>
+        } @else {
+          <span class="count">{{ handCount('west') }}</span>
+        }
+      </div>
+
+      <div class="trick-area">
+        @for (play of cardsInTrick(); track play.seat) {
+          <div class="trick-card" [class]="'from-' + play.seat">
+            <img [src]="cardImage(play.card)" [alt]="play.card.rank + ' of ' + play.card.suit" />
+          </div>
+        }
+        @if (cardsInTrick().length === 0) {
+          <p class="trick-empty">{{ turnLabel() }}</p>
+        }
+      </div>
+
+      <div class="seat-strip east">
+        <span class="seat-tag">{{ seatName('east') }}{{ dummy() === 'east' ? ' (dummy)' : '' }}</span>
+        @if (dummy() === 'east' && state().dummyRevealed) {
+          <div class="dummy-hand side">
+            @for (card of dummyHand(); track card.suit + card.rank) {
+              <img class="mini-img" [src]="cardImage(card)" [alt]="card.rank + ' of ' + card.suit" />
+            }
+          </div>
+        } @else {
+          <span class="count">{{ handCount('east') }}</span>
+        }
+      </div>
+    </section>
+
+    <footer class="player-dock">
+      <div class="dock-status">
+        <span class="tricks">N/S {{ state().tricksWon.ns }} &mdash; E/W {{ state().tricksWon.ew }}</span>
+        <span class="turn">{{ turnLabel() }}</span>
+      </div>
+
+      @if (state().phase === 'deal-summary') {
+        <div class="summary-actions">
+          <p class="deal-result">{{ state().message }}</p>
+          <p class="deal-score">N/S {{ state().scores.ns }} &mdash; E/W {{ state().scores.ew }}</p>
+          <button type="button" class="primary" (click)="nextDeal()">
+            {{ state().dealNumber >= dealsPerSession ? 'Finish Session' : 'Next Deal' }}
+          </button>
+        </div>
+      } @else {
+        <div class="south-hand">
+          @for (card of southHand(); track card.suit + card.rank) {
+            <button
+              type="button"
+              class="hand-card"
+              [class.playable]="isPlayable(card, 'south')"
+              [disabled]="!isPlayable(card, 'south')"
+              (click)="play(card)"
+            >
+              <img [src]="cardImage(card)" [alt]="card.rank + ' of ' + card.suit" />
+            </button>
+          }
+        </div>
+        @if (state().trickComplete) {
+          <button type="button" class="primary" (click)="acknowledgeTrick()">Next Trick</button>
+        }
+      }
+    </footer>
+  }
+</section>

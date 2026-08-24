@@ -51,6 +51,31 @@
         </div>
       }
     </div>
+  } @else if (gameId() === 'bridge') {
+    <h2>Bridge: Deal {{ bridge().dealNumber }} of 4</h2>
+    <p>{{ bridge().message }}</p>
+    <div class="scoreboard">
+      <div class="scoreboard-head">
+        <span>Deal</span>
+        <span class="num">Contract</span>
+        <span class="num">Tricks</span>
+        <span class="num">Score</span>
+      </div>
+      @for (deal of bridge().history; track deal.dealNumber) {
+        <div class="score-row">
+          <span class="player-name">{{ deal.dealNumber }} &mdash; {{ deal.scoredBy === 'ns' ? 'N/S' : 'E/W' }}</span>
+          <span class="num">{{ bridgeContractLabel(deal.contract) }}</span>
+          <span class="num">{{ deal.tricksWon }}</span>
+          <span class="num" [class.positive]="deal.made" [class.negative]="!deal.made">{{ deal.score }}</span>
+        </div>
+      }
+      <div class="score-row">
+        <span class="player-name">Running total</span>
+        <span class="num">&mdash;</span>
+        <span class="num">N/S {{ bridge().scores.ns }}</span>
+        <span class="num">E/W {{ bridge().scores.ew }}</span>
+      </div>
+    </div>
   } @else {
     <h2>Poker Showdown</h2>
     @if (pokerWinnerName()) {
@@ -130,7 +155,7 @@
   <div class="actions">
     @if (gameId() !== 'hearts' || !gameStatus().isOver) {
       <button class="primary" type="button" (click)="startNextRound()">
-        {{ gameId() === 'hearts' ? 'Play Next Round' : 'Deal Next Hand' }}
+        {{ nextRoundLabel() }}
       </button>
     }
     <button class="ghost" type="button" (click)="startNewGame()">

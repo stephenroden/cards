@@ -6,6 +6,9 @@ import { GameEngineService } from '../../hearts/services/game-engine.service';
 import { GameStateService } from '../../hearts/services/game-state.service';
 import { GameId, isGameId } from '../../games/game-pack.models';
 import { BlackjackEngineService } from '../../blackjack/services/blackjack-engine.service';
+import { Contract as BridgeContract } from '../../bridge/bridge.models';
+import { BridgeEngineService } from '../../bridge/services/bridge-engine.service';
+import { BridgeStateService } from '../../bridge/services/bridge-state.service';
 import { BlackjackStateService } from '../../blackjack/services/blackjack-state.service';
 import { describeHandValue } from '../../blackjack/services/blackjack-hand';
 import { evaluateBestHand } from '../../poker/services/poker-hand-evaluator';
@@ -26,6 +29,8 @@ export class ResultsPageComponent {
   private readonly pokerEngine = inject(PokerEngineService);
   private readonly blackjackEngine = inject(BlackjackEngineService);
   private readonly blackjackState = inject(BlackjackStateService);
+  private readonly bridgeEngine = inject(BridgeEngineService);
+  private readonly bridgeStateService = inject(BridgeStateService);
   private readonly pokerState = inject(PokerStateService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
@@ -37,6 +42,7 @@ export class ResultsPageComponent {
 
   readonly heartsState = this.gameState.state;
   readonly blackjack = this.blackjackState.state;
+  readonly bridge = this.bridgeStateService.state;
   readonly poker = this.pokerState.state;
 
   readonly blackjackRows = computed(() =>
@@ -117,7 +123,20 @@ export class ResultsPageComponent {
     })
   );
 
+  nextRoundLabel(): string {
+    if (this.gameId() === 'hearts') {
+      return 'Play Next Round';
+    }
+    return this.gameId() === 'bridge' ? 'Next Deal' : 'Deal Next Hand';
+  }
+
   startNextRound(): void {
+    if (this.gameId() === 'bridge') {
+      this.bridgeEngine.nextDeal();
+      void this.router.navigate(['/game/bridge']);
+      return;
+    }
+
     if (this.gameId() === 'blackjack') {
       this.blackjackEngine.nextHand();
       void this.router.navigate(['/game/blackjack']);
@@ -138,6 +157,12 @@ export class ResultsPageComponent {
   }
 
   startNewGame(): void {
+    if (this.gameId() === 'bridge') {
+      this.bridgeEngine.startSession();
+      void this.router.navigate(['/game/bridge']);
+      return;
+    }
+
     if (this.gameId() === 'blackjack') {
       this.blackjackEngine.startSession();
       void this.router.navigate(['/game/blackjack']);
@@ -171,6 +196,17 @@ export class ResultsPageComponent {
 
   pokerNet(playerId: string): number {
     return this.poker().lastHandNet[playerId] ?? 0;
+  }
+
+  bridgeContractLabel(contract: BridgeContract): string {
+    const symbols: Record<string, string> = {
+      clubs: '\u2663',
+      diamonds: '\u2666',
+      hearts: '\u2665',
+      spades: '\u2660',
+      notrump: 'NT'
+    };
+    return `${contract.level}${symbols[contract.strain]}`;
   }
 
   blackjackHandValue(cards: Card[]): string {

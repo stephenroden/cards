@@ -21,6 +21,18 @@
       <li>The dealer draws to 17 and stands on soft 17 unless the variant is enabled.</li>
       <li>You act first, then the CPU seats play basic strategy, then the dealer draws.</li>
     </ol>
+  } @else if (gameId() === 'bridge') {
+    <h2>Bridge Rules</h2>
+    <ol>
+      <li>4 seats in two partnerships: you and North against East and West.</li>
+      <li>There is no auction yet, so you choose the contract and who declares.</li>
+      <li>Declarer plays their own hand and dummy; dummy goes face up after the opening lead.</li>
+      <li>The opening lead comes from the seat on declarer's left.</li>
+      <li>Follow suit if you can; otherwise play anything, including a trump.</li>
+      <li>The highest trump wins a trick, or the highest card of the suit led if no trump is played.</li>
+      <li>Declarer needs six tricks plus the contract level, so 3NT needs nine tricks.</li>
+      <li>Chicago scoring over four deals: vulnerability runs none, N/S, E/W, both.</li>
+    </ol>
   } @else {
     <h2>Poker Rules (Texas Hold'em)</h2>
     <ol>
