@@ -2,6 +2,10 @@
   command = "npm run build"
   publish = "dist/cards/browser"
 
+# @netlify/angular-runtime needs ^22.22.0 || ^24.13.1 || >=26.0.0; keep this in step with .nvmrc.
+[build.environment]
+  NODE_VERSION = "24.19.0"
+
 [[headers]]
   for = "/cards/*"
   [headers.values]
