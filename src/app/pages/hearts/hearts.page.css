@@ -1,4 +1,4 @@
-:host.game-page {
+:host.hearts-page {
   display: grid;
   grid-template-rows: 1fr;
   gap: 8px;
@@ -610,7 +610,7 @@
 }
 
 @media (max-height: 420px) {
-  :host.game-page {
+  :host.hearts-page {
     gap: 6px;
     padding: 8px;
     padding-bottom: max(8px, env(safe-area-inset-bottom));
@@ -722,7 +722,7 @@
 }
 
 @media (orientation: portrait) {
-  :host.game-page {
+  :host.hearts-page {
     padding: 8px;
     padding-bottom: max(8px, env(safe-area-inset-bottom));
   }

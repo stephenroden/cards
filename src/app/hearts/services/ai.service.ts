@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { AiDecisionTrace, Card, GameRules, GameState, Player } from '../game.models';
+import { Card } from '../../cards/card.models';
+import { AiDecisionTrace, GameRules, GameState, Player } from '../hearts.models';
 import { AI_PROFILES, DEFAULT_PASS_TUNING } from './ai-profiles';
 import { describeChoice } from './ai-decision-trace';
 import { chooseRandomPassCards, chooseSharkPassCards, chooseSmartPassCards } from './ai-pass-selection';

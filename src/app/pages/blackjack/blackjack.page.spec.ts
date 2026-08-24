@@ -8,8 +8,7 @@ import {
   initialSeats
 } from '../../blackjack/services/blackjack-state.service';
 import { BlackjackSeat } from '../../blackjack/blackjack.models';
-import { Card } from '../../game/game.models';
-
+import { Card } from '../../cards/card.models';
 const card = (rank: Card['rank'], suit: Card['suit'] = 'spades'): Card => ({ rank, suit });
 
 const stackedShoe = (...cards: Card[]): Card[] => [

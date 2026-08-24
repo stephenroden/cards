@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Card } from '../../game/game.models';
+import { Card } from '../../cards/card.models';
 import { compareHands } from './poker-hand-evaluator';
 import { PokerAiService } from './poker-ai.service';
 import { buildDeck, cardLabel, shuffle } from './poker-utils';

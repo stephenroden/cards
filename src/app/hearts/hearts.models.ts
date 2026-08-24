@@ -1,18 +1,4 @@
-export type Suit = 'clubs' | 'diamonds' | 'hearts' | 'spades';
-export type Rank =
-  | '2'
-  | '3'
-  | '4'
-  | '5'
-  | '6'
-  | '7'
-  | '8'
-  | '9'
-  | '10'
-  | 'J'
-  | 'Q'
-  | 'K'
-  | 'A';
+import { Card } from '../cards/card.models';
 
 export type GamePhase = 'deal' | 'pass' | 'play' | 'score' | 'summary';
 export type PassDirection = 'left' | 'right' | 'across' | 'none';
@@ -26,11 +12,6 @@ export const DEFAULT_GAME_RULES: GameRules = {
   jackOfDiamondsMinus10: false,
   debugAiHistory: true
 };
-
-export interface Card {
-  suit: Suit;
-  rank: Rank;
-}
 
 export interface PlayedCard {
   playerId: string;
@@ -92,6 +73,3 @@ export interface GameState {
   aiReasonVisibility: Record<string, boolean>;
   passComplete?: boolean;
 }
-
-export const SUITS: Suit[] = ['clubs', 'diamonds', 'hearts', 'spades'];
-export const RANKS: Rank[] = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];

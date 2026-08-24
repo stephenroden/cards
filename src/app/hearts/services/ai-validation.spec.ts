@@ -1,7 +1,9 @@
 import { TestBed } from '@angular/core/testing';
 import { AI_PROFILES } from './ai-profiles';
 import { AiService } from './ai.service';
-import { DEFAULT_GAME_RULES, type Card, type GameRules, type GameState, type Player, RANKS, SUITS } from '../game.models';
+import { RANKS, SUITS } from '../../cards/card.models';
+import type { Card } from '../../cards/card.models';
+import { DEFAULT_GAME_RULES, type GameRules, type GameState, type Player } from '../hearts.models';
 import { RulesService } from './rules.service';
 
 const card = (suit: Card['suit'], rank: Card['rank']): Card => ({ suit, rank });

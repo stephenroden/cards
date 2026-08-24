@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
-import { Card, DEFAULT_GAME_RULES, GameRules, GameState, Player, RANKS, SUITS } from '../game.models';
-
+import { Card, RANKS, SUITS } from '../../cards/card.models';
+import { DEFAULT_GAME_RULES, GameRules, GameState, Player } from '../hearts.models';
 type CpuSkillLevel = 'Easy' | 'Medium' | 'Hard';
 
 interface CpuBotTemplate {

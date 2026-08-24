@@ -1,6 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { Player } from '../../../../game/game.models';
-
+import { Player } from '../../../../hearts/hearts.models';
 @Component({
   selector: 'app-game-player-chip',
   standalone: true,

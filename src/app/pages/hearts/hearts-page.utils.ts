@@ -1,5 +1,5 @@
-import { AiDecisionTrace, Card } from '../../game/game.models';
-
+import { Card } from '../../cards/card.models';
+import { AiDecisionTrace } from '../../hearts/hearts.models';
 export type TraceLike = Pick<AiDecisionTrace, 'factors' | 'reasonCode' | 'summary'>;
 
 export const reasonLabel = (reasonCode: string): string => {

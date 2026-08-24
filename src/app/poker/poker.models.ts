@@ -1,5 +1,4 @@
-import { Card } from '../game/game.models';
-
+import { Card } from '../cards/card.models';
 export type PokerStreet = 'preflop' | 'flop' | 'turn' | 'river';
 export type PokerPhase = PokerStreet | 'showdown' | 'hand-summary' | 'session-over';
 export type PokerActionType = 'fold' | 'check' | 'call' | 'bet' | 'raise';

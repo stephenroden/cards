@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { Card } from '../../game/game.models';
+import { Card } from '../../cards/card.models';
 import { BlackjackSeat, BlackjackState, MIN_BET } from '../blackjack.models';
 import { BlackjackEngineService } from './blackjack-engine.service';
 import { BlackjackStateService, initialBlackjackState, initialSeats } from './blackjack-state.service';

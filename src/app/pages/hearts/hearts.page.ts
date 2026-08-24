@@ -1,10 +1,11 @@
 import { Component, ElementRef, HostListener, computed, effect, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { Card, Player } from '../../game/game.models';
-import { GameEngineService } from '../../game/services/game-engine.service';
-import { GameStateService } from '../../game/services/game-state.service';
-import { RulesService } from '../../game/services/rules.service';
-import { scoreCard } from '../../game/services/scoring';
+import { Card } from '../../cards/card.models';
+import { Player } from '../../hearts/hearts.models';
+import { GameEngineService } from '../../hearts/services/game-engine.service';
+import { GameStateService } from '../../hearts/services/game-state.service';
+import { RulesService } from '../../hearts/services/rules.service';
+import { scoreCard } from '../../hearts/services/scoring';
 import { GameDebugEntry, GameDebugPanelComponent } from './components/game-debug-panel/game-debug-panel.component';
 import { GamePlayerChipComponent } from './components/game-player-chip/game-player-chip.component';
 import {
@@ -16,19 +17,19 @@ import {
   seatForPlayer,
   sortCards,
   suitSymbol as getSuitSymbol
-} from './game-page.utils';
+} from './hearts-page.utils';
 
 @Component({
-  selector: 'app-game-page',
+  selector: 'app-hearts-page',
   standalone: true,
   imports: [RouterLink, GameDebugPanelComponent, GamePlayerChipComponent],
-  templateUrl: './game.page.html',
-  styleUrl: './game.page.css',
+  templateUrl: './hearts.page.html',
+  styleUrl: './hearts.page.css',
   host: {
-    class: 'game-page'
+    class: 'hearts-page'
   }
 })
-export class GamePageComponent {
+export class HeartsPageComponent {
   private readonly gameEngine = inject(GameEngineService);
   private readonly gameState = inject(GameStateService);
   private readonly rules = inject(RulesService);

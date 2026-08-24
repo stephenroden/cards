@@ -1,4 +1,6 @@
-import { DEFAULT_GAME_RULES, type Card, type GameRules, type GameState, type Player, RANKS, SUITS } from '../game.models';
+import { RANKS, SUITS } from '../../cards/card.models';
+import type { Card } from '../../cards/card.models';
+import { DEFAULT_GAME_RULES, type GameRules, type GameState, type Player } from '../hearts.models';
 import { AiService } from './ai.service';
 import { RulesService } from './rules.service';
 import { applyRoundScores, MOON_POINTS, penaltyScoreCard } from './scoring';

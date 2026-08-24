@@ -1,4 +1,4 @@
-import { Card } from '../../game/game.models';
+import { Card } from '../../cards/card.models';
 import { BlackjackHand, BlackjackRules } from '../blackjack.models';
 
 export interface HandValue {

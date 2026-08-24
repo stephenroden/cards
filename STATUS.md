@@ -9,11 +9,11 @@
 - Pass button is embedded near the status area in the table.
 
 ## Key Files
-- `src/app/game/services/game-engine.service.ts` (round flow, pass logic, scoring)
-- `src/app/game/services/rules.service.ts` (legal play + trick winner)
-- `src/app/game/services/ai.service.ts` (AI tiers)
-- `src/app/pages/game/game.page.ts` (UI state + pass selection)
-- `src/app/pages/game/game.page.html` + `src/app/pages/game/game.page.css` (table layout + cards)
+- `src/app/hearts/services/game-engine.service.ts` (round flow, pass logic, scoring)
+- `src/app/hearts/services/rules.service.ts` (legal play + trick winner)
+- `src/app/hearts/services/ai.service.ts` (AI tiers)
+- `src/app/pages/hearts/hearts.page.ts` (UI state + pass selection)
+- `src/app/pages/hearts/hearts.page.html` + `src/app/pages/hearts/hearts.page.css` (table layout + cards)
 - `src/app/app.html` + `src/app/app.css` (header actions)
 
 ## What’s Working

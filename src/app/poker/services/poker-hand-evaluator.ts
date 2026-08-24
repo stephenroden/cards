@@ -1,5 +1,4 @@
-import { Card, Rank, Suit } from '../../game/game.models';
-
+import { Card, Rank, Suit } from '../../cards/card.models';
 interface RankedCard {
   rank: number;
   suit: Suit;

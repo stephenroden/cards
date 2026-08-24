@@ -1,6 +1,5 @@
 import { compareHands, evaluateBestHand } from './poker-hand-evaluator';
-import { Card } from '../../game/game.models';
-
+import { Card } from '../../cards/card.models';
 const card = (rank: Card['rank'], suit: Card['suit']): Card => ({ rank, suit });
 
 describe('poker-hand-evaluator', () => {

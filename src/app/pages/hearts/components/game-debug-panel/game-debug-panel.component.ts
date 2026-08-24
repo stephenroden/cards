@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
-import { TraceLike, genericContext, jDiamondContext, qSpadeContext, reasonLabel } from '../../game-page.utils';
+import { TraceLike, genericContext, jDiamondContext, qSpadeContext, reasonLabel } from '../../hearts-page.utils';
 
 export interface GameDebugEntry {
   index: number;

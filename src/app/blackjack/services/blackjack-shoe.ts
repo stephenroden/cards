@@ -1,4 +1,4 @@
-import { Card, RANKS, SUITS } from '../../game/game.models';
+import { Card, RANKS, SUITS } from '../../cards/card.models';
 import { shuffle } from '../../poker/services/poker-utils';
 
 /** Fraction of the shoe dealt before it is reshuffled. */

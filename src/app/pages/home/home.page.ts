@@ -2,7 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { BUILD_DATE } from '../../build-info';
 import { BlackjackEngineService } from '../../blackjack/services/blackjack-engine.service';
-import { GameStateService } from '../../game/services/game-state.service';
+import { GameStateService } from '../../hearts/services/game-state.service';
 import { ThemeService } from '../../theme.service';
 
 const JACK_OF_DIAMONDS_KEY = 'cards.game.hearts.rules.jack_of_diamonds_minus_10';

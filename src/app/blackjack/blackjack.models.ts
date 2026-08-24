@@ -1,5 +1,4 @@
-import { Card } from '../game/game.models';
-
+import { Card } from '../cards/card.models';
 export type BlackjackPhase =
   | 'betting'
   | 'insurance'

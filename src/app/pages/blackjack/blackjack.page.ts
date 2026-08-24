@@ -1,6 +1,6 @@
 import { Component, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { Card } from '../../game/game.models';
+import { Card } from '../../cards/card.models';
 import {
   BlackjackActionType,
   BlackjackHand,

@@ -1,4 +1,5 @@
-import { AiDecisionTrace, Card, GameRules, GameState, Player } from '../game.models';
+import { Card } from '../../cards/card.models';
+import { AiDecisionTrace, GameRules, GameState, Player } from '../hearts.models';
 import { scoreCard } from './scoring';
 
 const rankOrder: Record<Card['rank'], number> = {

@@ -1,4 +1,5 @@
-import { Card, GameRules, GameState, Player, Suit } from '../game.models';
+import { Card, Suit } from '../../cards/card.models';
+import { GameRules, GameState, Player } from '../hearts.models';
 import { AiProfile, AI_PROFILES } from './ai-profiles';
 import { AiStrategy } from './ai-strategy';
 import { isDangerCard, scoreCard } from './scoring';

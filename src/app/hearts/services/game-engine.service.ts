@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { AiDecisionTrace, Card, GameState, Player } from '../game.models';
+import { Card } from '../../cards/card.models';
+import { AiDecisionTrace, GameState, Player } from '../hearts.models';
 import { AiService } from './ai.service';
 import { applyPasses, getPassDirection, nextTurnPlayerId, sameCard, suitGlyph } from './game-engine.utils';
 import { GameStateService } from './game-state.service';

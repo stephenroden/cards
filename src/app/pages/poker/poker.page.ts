@@ -1,7 +1,7 @@
 import { Component, computed, effect, inject } from '@angular/core';
 import { TitleCasePipe } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
-import { Card } from '../../game/game.models';
+import { Card } from '../../cards/card.models';
 import { cardImage } from '../../poker/services/poker-utils';
 import { PokerActionType, PokerPlayer } from '../../poker/poker.models';
 import { PokerEngineService } from '../../poker/services/poker-engine.service';

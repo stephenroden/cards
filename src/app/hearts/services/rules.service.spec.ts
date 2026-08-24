@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-import { Card, DEFAULT_GAME_RULES, GameState, Player } from '../game.models';
+import { Card } from '../../cards/card.models';
+import { DEFAULT_GAME_RULES, GameState, Player } from '../hearts.models';
 import { RulesService } from './rules.service';
 
 const basePlayer = (overrides: Partial<Player> = {}): Player => ({

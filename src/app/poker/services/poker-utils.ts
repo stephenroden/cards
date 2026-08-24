@@ -1,5 +1,4 @@
-import { Card, RANKS, SUITS } from '../../game/game.models';
-
+import { Card, RANKS, SUITS } from '../../cards/card.models';
 export const buildDeck = (): Card[] => {
   const deck: Card[] = [];
   for (const suit of SUITS) {

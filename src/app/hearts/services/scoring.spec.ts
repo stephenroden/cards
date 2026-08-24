@@ -1,4 +1,5 @@
-import { DEFAULT_GAME_RULES, type Card, type GameState, type Player } from '../game.models';
+import type { Card } from '../../cards/card.models';
+import { DEFAULT_GAME_RULES, type GameState, type Player } from '../hearts.models';
 import { applyRoundScores, scoreCard } from './scoring';
 
 const card = (suit: Card['suit'], rank: Card['rank']): Card => ({ suit, rank });

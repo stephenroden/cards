@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { Card } from '../../game/game.models';
+import { Card } from '../../cards/card.models';
 import {
   BlackjackActionType,
   BlackjackHand,

@@ -1,5 +1,5 @@
-import { Card, GameState, Player } from '../game.models';
-
+import { Card } from '../../cards/card.models';
+import { GameState, Player } from '../hearts.models';
 export const getPassDirection = (round: number): GameState['passDirection'] => {
   const cycle = (round - 1) % 4;
   if (cycle === 0) {

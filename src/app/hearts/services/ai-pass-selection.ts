@@ -1,4 +1,5 @@
-import { Card, GameRules, Player } from '../game.models';
+import { Card } from '../../cards/card.models';
+import { GameRules, Player } from '../hearts.models';
 import { PassTuning } from './ai-profiles';
 
 const rankOrder: Record<Card['rank'], number> = {

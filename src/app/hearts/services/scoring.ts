@@ -1,5 +1,5 @@
-import { Card, GameRules, Player } from '../game.models';
-
+import { Card } from '../../cards/card.models';
+import { GameRules, Player } from '../hearts.models';
 export const MOON_POINTS = 26;
 
 export const scoreCard = (card: Card, rules: GameRules): number => {

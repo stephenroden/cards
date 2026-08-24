@@ -8,11 +8,11 @@
     "prebuild": "node scripts/write-build-info.mjs",
     "build": "ng build",
     "prebenchmark:ai": "node scripts/write-build-info.mjs",
-    "benchmark:ai": "ng test --watch=false --include src/app/game/services/ai-benchmark.spec.ts",
+    "benchmark:ai": "ng test --watch=false --include src/app/hearts/services/ai-benchmark.spec.ts",
     "deploy:netlify": "npm run build && npx netlify deploy --prod --dir=dist/cards/browser",
     "watch": "ng build --watch --configuration development",
     "pretest": "node scripts/write-build-info.mjs",
-    "test": "ng test --exclude src/app/game/services/ai-benchmark.spec.ts"
+    "test": "ng test --exclude src/app/hearts/services/ai-benchmark.spec.ts"
   },
   "prettier": {
     "printWidth": 100,

@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { Card } from '../../game/game.models';
+import { Card } from '../../cards/card.models';
 import { PokerPlayer, PokerState, PokerStreet } from '../poker.models';
 
 const POKER_STATE_STORAGE_KEY = 'cards.poker.state';

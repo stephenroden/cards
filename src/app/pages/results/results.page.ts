@@ -1,9 +1,9 @@
 import { Component, computed, inject } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { Card } from '../../game/game.models';
-import { scoreCard } from '../../game/services/scoring';
-import { GameEngineService } from '../../game/services/game-engine.service';
-import { GameStateService } from '../../game/services/game-state.service';
+import { Card } from '../../cards/card.models';
+import { scoreCard } from '../../hearts/services/scoring';
+import { GameEngineService } from '../../hearts/services/game-engine.service';
+import { GameStateService } from '../../hearts/services/game-state.service';
 import { GameId, isGameId } from '../../games/game-pack.models';
 import { BlackjackEngineService } from '../../blackjack/services/blackjack-engine.service';
 import { BlackjackStateService } from '../../blackjack/services/blackjack-state.service';
