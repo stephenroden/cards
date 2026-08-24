@@ -71,8 +71,7 @@
   height: 38px;
   border-radius: 999px;
   border: 0;
-  background: color-mix(in srgb, var(--surface-soft) 62%, transparent);
-  border: 1px solid var(--poker-panel-border);
+  background: transparent;
   color: var(--text-primary);
   display: grid;
   place-items: center;
