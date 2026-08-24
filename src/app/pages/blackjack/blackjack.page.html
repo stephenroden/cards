@@ -1,0 +1,175 @@
+<section class="blackjack-shell">
+  <header class="table-header">
+    <div class="header-title">
+      <details class="table-actions-menu">
+        <summary class="menu-trigger" aria-label="Open blackjack actions">☰</summary>
+        <nav class="menu-panel">
+          <a routerLink="/results/blackjack">Results</a>
+          <a routerLink="/rules/blackjack">Rules</a>
+          <a routerLink="/">Exit</a>
+        </nav>
+      </details>
+      <h1>Blackjack</h1>
+    </div>
+    <div class="header-stats">
+      <div class="summary-chip">
+        <span class="label">Bankroll</span>
+        <strong>{{ formatChips(you().bankroll) }}</strong>
+      </div>
+      <div class="summary-chip">
+        <span class="label">Bet</span>
+        <strong>{{ formatChips(you().bet) }}</strong>
+      </div>
+    </div>
+  </header>
+
+  <section class="table-stage">
+    <div class="dealer-area">
+      <div class="seat-label">
+        <span>Dealer</span>
+        @if (dealerValueText()) {
+          <strong>{{ dealerValueText() }}</strong>
+        }
+      </div>
+      <div class="card-row">
+        @for (card of state().dealer; track $index) {
+          @if ($index === 1 && state().holeCardHidden) {
+            <div class="card-back" aria-label="Face-down card"></div>
+          } @else {
+            <img [src]="cardImage(card)" [alt]="card.rank + ' of ' + card.suit" />
+          }
+        }
+        @if (state().dealer.length === 0) {
+          <div class="card-slot"></div>
+          <div class="card-slot"></div>
+        }
+      </div>
+    </div>
+
+    <p class="table-message">{{ statusText() }}</p>
+
+    <div class="cpu-row">
+      @for (seat of opponents(); track seat.id) {
+        <article class="seat-pod" [class.out]="seat.out">
+          <div class="pod-head">
+            <strong>{{ seat.name }}</strong>
+            <span>{{ formatChips(seat.bankroll) }}</span>
+          </div>
+          <div class="pod-hands">
+            @for (hand of seat.hands; track hand.id) {
+              <div class="pod-hand">
+                <div class="card-row tight">
+                  @for (card of hand.cards; track $index) {
+                    <img [src]="cardImage(card)" [alt]="card.rank + ' of ' + card.suit" />
+                  }
+                </div>
+                <span class="pod-value">{{ handValueText(hand) }}</span>
+                @if (hand.outcome) {
+                  <span class="outcome" [class]="'outcome-' + hand.outcome">{{ outcomeLabel(hand) }}</span>
+                }
+              </div>
+            }
+            @if (seat.hands.length === 0) {
+              <div class="card-row tight">
+                <div class="card-slot"></div>
+                <div class="card-slot"></div>
+              </div>
+            }
+          </div>
+          <p class="pod-status">{{ seatStatus(seat) }}</p>
+        </article>
+      }
+    </div>
+
+    <div class="player-area">
+      <div class="hand-row" [class.multi]="you().hands.length > 1">
+        @if (you().hands.length === 0) {
+          <div class="card-row">
+            <div class="card-slot"></div>
+            <div class="card-slot"></div>
+          </div>
+        }
+        @for (hand of you().hands; track hand.id) {
+          <article class="player-hand" [class.active]="isActiveHand($index)" [class.settled]="hand.outcome !== null">
+            <div class="seat-label">
+              <span>{{ you().hands.length > 1 ? 'Hand ' + ($index + 1) : 'You' }}</span>
+              <strong>{{ handValueText(hand) }}</strong>
+            </div>
+            <div class="card-row">
+              @for (card of hand.cards; track $index) {
+                <img [src]="cardImage(card)" [alt]="card.rank + ' of ' + card.suit" />
+              }
+            </div>
+            <div class="hand-foot">
+              <span class="bet-tag">{{ formatChips(hand.bet) }}</span>
+              @if (hand.outcome) {
+                <span class="outcome" [class]="'outcome-' + hand.outcome">{{ outcomeLabel(hand) }}</span>
+              }
+            </div>
+          </article>
+        }
+      </div>
+    </div>
+  </section>
+
+  <footer class="control-bar">
+    @switch (state().phase) {
+      @case ('betting') {
+        <div class="bet-controls">
+          <div class="chip-row">
+            @for (chip of chips; track chip) {
+              <button
+                type="button"
+                class="chip"
+                [style.--chip-body]="chipColor(chip)"
+                (click)="addToBet(chip)"
+                [disabled]="chip > you().bankroll - you().bet"
+              >
+                <span class="chip-value">{{ chip }}</span>
+              </button>
+            }
+          </div>
+          <div class="button-row">
+            <button type="button" class="ghost" (click)="clearBet()" [disabled]="you().bet === 0">Clear</button>
+            <button type="button" class="ghost" (click)="repeatLastBet()" [disabled]="you().lastBet > you().bankroll">
+              Repeat {{ formatChips(you().lastBet) }}
+            </button>
+            <button type="button" class="primary" (click)="deal()" [disabled]="!canDeal()">Deal</button>
+          </div>
+          <p class="hint">Minimum bet {{ minBet }}.</p>
+        </div>
+      }
+      @case ('insurance') {
+        <div class="button-row">
+          <button type="button" class="primary" (click)="takeInsurance()">
+            Insurance ({{ formatChips(insuranceCost()) }})
+          </button>
+          <button type="button" class="ghost" (click)="declineInsurance()">No Insurance</button>
+        </div>
+      }
+      @case ('player-turn') {
+        <div class="button-row">
+          @for (action of legalActions(); track action) {
+            <button type="button" [class]="action === 'hit' || action === 'stand' ? 'primary' : 'ghost'" (click)="act(action)">
+              {{ actionLabel(action) }}
+            </button>
+          }
+        </div>
+      }
+      @case ('hand-summary') {
+        <div class="summary-controls">
+          <p class="net" [class.up]="you().lastNet > 0" [class.down]="you().lastNet < 0">
+            {{ formatNet(you().lastNet) }} chips
+          </p>
+          <button type="button" class="primary" (click)="nextHand()">Next Hand</button>
+        </div>
+      }
+      @case ('session-over') {
+        <div class="summary-controls">
+          <p class="net down">Out of chips.</p>
+          <button type="button" class="primary" (click)="newSession()">New Session</button>
+        </div>
+      }
+    }
+  </footer>
+</section>

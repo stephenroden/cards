@@ -1,0 +1,528 @@
+:host {
+  display: block;
+  height: 100dvh;
+  overflow: hidden;
+  --card-w: clamp(44px, 6vw, 72px);
+  --pod-card-w: clamp(26px, 3.4vw, 40px);
+  --card-radius: 8px;
+  --bj-felt-glow: color-mix(in srgb, var(--accent-primary) 26%, transparent);
+  --bj-felt-core: color-mix(in srgb, var(--surface-strong) 72%, #0c2719 28%);
+  --bj-felt-edge: color-mix(in srgb, var(--surface-strong) 84%, #020705 16%);
+  --bj-panel: color-mix(in srgb, var(--surface-strong) 78%, transparent);
+  --bj-panel-border: color-mix(in srgb, var(--border-soft) 70%, transparent);
+  --bj-subtle: color-mix(in srgb, var(--text-primary) 60%, transparent);
+  --bj-button: color-mix(in srgb, var(--surface-soft) 68%, white 8%);
+  --bj-card-back-start: color-mix(in srgb, var(--accent-on-primary) 42%, #27314f 58%);
+  --bj-card-back-end: color-mix(in srgb, var(--surface-strong) 72%, #141a2e 28%);
+  --bj-win: color-mix(in srgb, #3fbf7f 62%, var(--surface-strong) 38%);
+  --bj-lose: color-mix(in srgb, #b3453a 58%, var(--surface-strong) 42%);
+  --bj-push: color-mix(in srgb, var(--text-primary) 26%, var(--surface-strong) 74%);
+}
+
+.blackjack-shell {
+  height: 100%;
+  padding: clamp(8px, 1.2vh, 12px);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: clamp(6px, 1vh, 12px);
+  color: var(--text-primary);
+  background:
+    radial-gradient(circle at 50% 16%, var(--bj-felt-glow), transparent 26%),
+    radial-gradient(circle at 50% 52%, var(--bj-felt-core), var(--bj-felt-edge));
+  border-radius: 28px;
+  overflow: hidden;
+}
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-title h1 {
+  margin: 0;
+  font-size: clamp(1rem, 2.4vw, 1.35rem);
+  letter-spacing: 0.04em;
+}
+
+.header-stats {
+  display: flex;
+  gap: 8px;
+}
+
+.summary-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding: 4px 10px;
+  border-radius: 12px;
+  background: var(--bj-panel);
+  min-width: 64px;
+}
+
+.summary-chip .label {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--bj-subtle);
+}
+
+.summary-chip strong {
+  font-size: 0.95rem;
+}
+
+.table-actions-menu {
+  position: relative;
+}
+
+.menu-trigger {
+  list-style: none;
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  border: 0;
+  background: transparent;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.menu-trigger::-webkit-details-marker {
+  display: none;
+}
+
+.menu-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  min-width: 132px;
+  border-radius: 12px;
+  padding: 6px;
+  background: color-mix(in srgb, var(--surface-strong) 96%, transparent);
+  border: 1px solid var(--bj-panel-border);
+}
+
+.menu-panel a {
+  padding: 8px 10px;
+  border-radius: 8px;
+  color: var(--text-primary);
+  text-decoration: none;
+  font-size: 0.85rem;
+}
+
+/* The four bands size to their content and share the felt evenly rather than pooling slack under your hand. */
+.table-stage {
+  display: grid;
+  grid-template-rows: repeat(4, auto);
+  align-content: space-evenly;
+  gap: clamp(4px, 1vh, 14px);
+  min-height: 0;
+}
+
+.dealer-area,
+.player-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-height: 0;
+}
+
+.player-area {
+  justify-content: center;
+}
+
+.seat-label {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--bj-subtle);
+}
+
+.seat-label strong {
+  font-size: 0.95rem;
+  letter-spacing: 0;
+  color: var(--text-primary);
+}
+
+.card-row {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.card-row img,
+.card-back,
+.card-slot {
+  width: var(--card-w);
+  border-radius: var(--card-radius);
+  aspect-ratio: 5 / 7;
+  display: block;
+}
+
+.card-row img {
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.34);
+}
+
+.card-back {
+  background: linear-gradient(150deg, var(--bj-card-back-start), var(--bj-card-back-end));
+  border: 1px solid var(--bj-panel-border);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.34);
+}
+
+.card-slot {
+  border: 1px dashed color-mix(in srgb, var(--border-soft) 55%, transparent);
+  background: color-mix(in srgb, var(--surface-soft) 30%, transparent);
+}
+
+.table-message {
+  margin: 0;
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  min-height: 1.2em;
+}
+
+.cpu-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(4px, 1vw, 10px);
+  align-items: start;
+}
+
+.seat-pod {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+  justify-items: center;
+  padding: 6px 6px 5px;
+  border-radius: 14px;
+  background: var(--bj-panel);
+}
+
+.seat-pod.out {
+  opacity: 0.45;
+}
+
+.pod-head {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  max-width: 100%;
+  font-size: 0.72rem;
+}
+
+.pod-head strong {
+  font-size: 0.78rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pod-head span {
+  color: var(--bj-subtle);
+}
+
+.pod-hands {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.pod-hand {
+  display: grid;
+  gap: 2px;
+  justify-items: center;
+}
+
+/* CPU hands can run long, so their cards fan under one another instead of wrapping. */
+.card-row.tight {
+  gap: 0;
+  flex-wrap: nowrap;
+}
+
+.card-row.tight img,
+.card-row.tight .card-slot {
+  width: var(--pod-card-w);
+  border-radius: 4px;
+}
+
+.card-row.tight > * + * {
+  margin-left: calc(var(--pod-card-w) * -0.26);
+}
+
+.pod-value {
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.pod-status {
+  margin: 0;
+  font-size: 0.62rem;
+  color: var(--bj-subtle);
+}
+
+.hand-row {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  min-height: 0;
+}
+
+.hand-row.multi {
+  --card-w: clamp(30px, 3.6vw, 46px);
+}
+
+.player-hand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  border-radius: 14px;
+  border: 1px solid transparent;
+}
+
+.player-hand.active {
+  border-color: var(--accent-primary);
+  background: color-mix(in srgb, var(--accent-primary) 12%, transparent);
+}
+
+.player-hand.settled {
+  opacity: 0.92;
+}
+
+.hand-foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bet-tag {
+  font-size: 0.72rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--bj-panel);
+  border: 1px solid var(--bj-panel-border);
+}
+
+.outcome {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 1px 6px;
+  border-radius: 999px;
+}
+
+.player-hand .outcome {
+  font-size: 0.72rem;
+  padding: 2px 8px;
+}
+
+.outcome-win,
+.outcome-blackjack {
+  background: var(--bj-win);
+}
+
+.outcome-lose,
+.outcome-bust,
+.outcome-surrender {
+  background: var(--bj-lose);
+}
+
+.outcome-push {
+  background: var(--bj-push);
+}
+
+.control-bar {
+  display: flex;
+  justify-content: center;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.bet-controls,
+.summary-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.chip-row,
+.button-row {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+  border-radius: 999px;
+  padding: 10px 18px;
+  min-height: 44px;
+  min-width: 64px;
+  border: 1px solid var(--bj-panel-border);
+  color: var(--text-primary);
+  background: var(--bj-button);
+}
+
+button.primary {
+  background: var(--accent-primary);
+  color: var(--accent-on-primary);
+  border-color: transparent;
+  font-weight: 600;
+}
+
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* A chip is three stacked layers: edge spots around the rim, a printed face, then the value. */
+.chip {
+  --chip-body: var(--accent-primary);
+  --chip-spot: color-mix(in srgb, white 88%, var(--chip-body));
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-width: 56px;
+  aspect-ratio: 1;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  color: #fff;
+  font-weight: 700;
+  background: repeating-conic-gradient(
+    from 22.5deg,
+    var(--chip-spot) 0 21deg,
+    var(--chip-body) 21deg 45deg
+  );
+  box-shadow:
+    0 4px 10px rgba(0, 0, 0, 0.42),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.28);
+}
+
+.chip::before {
+  content: '';
+  position: absolute;
+  inset: 13%;
+  border-radius: 50%;
+  background: var(--chip-body);
+  box-shadow:
+    inset 0 0 0 2px color-mix(in srgb, white 42%, transparent),
+    inset 0 0 7px rgba(0, 0, 0, 0.4);
+}
+
+/* Positioned so it paints above the face, which is an absolutely placed pseudo-element. */
+.chip-value {
+  position: relative;
+  font-size: 0.9rem;
+  letter-spacing: 0.02em;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
+}
+
+.hint {
+  margin: 0;
+  font-size: 0.7rem;
+  color: var(--bj-subtle);
+}
+
+.net {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.net.up {
+  color: color-mix(in srgb, #6fe0a6 78%, var(--text-primary));
+}
+
+.net.down {
+  color: color-mix(in srgb, #ff9c92 78%, var(--text-primary));
+}
+
+@media (max-width: 560px) {
+  :host {
+    --card-w: clamp(44px, 15vw, 64px);
+    --pod-card-w: clamp(26px, 8.6vw, 36px);
+  }
+
+  .blackjack-shell {
+    padding: 8px;
+    gap: 6px;
+    border-radius: 20px;
+  }
+
+  .hand-row.multi {
+    --card-w: clamp(28px, 9vw, 40px);
+  }
+
+  .table-message {
+    font-size: 0.8rem;
+  }
+
+  .summary-chip {
+    min-width: 54px;
+    padding: 3px 8px;
+  }
+
+  .seat-pod {
+    padding: 5px 4px;
+    border-radius: 12px;
+  }
+
+  .pod-head {
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  .chip {
+    min-width: 48px;
+  }
+
+  button {
+    min-height: 40px;
+    min-width: 56px;
+    padding: 8px 12px;
+    font-size: 0.85rem;
+  }
+}
+
+/* Short viewports (landscape phones) lose the felt padding before they lose a seat. */
+@media (max-height: 620px) {
+  :host {
+    --card-w: clamp(32px, 8vh, 48px);
+    --pod-card-w: clamp(18px, 4.4vh, 26px);
+  }
+
+  .table-stage {
+    gap: 4px;
+  }
+
+  .hint {
+    display: none;
+  }
+}

@@ -8,6 +8,19 @@
       <li>Optional variant: jack of diamonds is worth -10 points.</li>
       <li>Shooting the moon scores 26 points to others.</li>
     </ol>
+  } @else if (gameId() === 'blackjack') {
+    <h2>Blackjack Rules</h2>
+    <ol>
+      <li>4 seats: you and 3 CPUs, each betting its own chips against one dealer from a six-deck shoe.</li>
+      <li>Cards count face value, faces are 10, and an ace is 11 until that would bust.</li>
+      <li>A natural 21 on the first two cards pays 3:2; any other win pays even money.</li>
+      <li>Double takes exactly one more card for a matching bet; split pairs into two hands.</li>
+      <li>Split aces get one card each, and 21 after a split is not a natural.</li>
+      <li>Insurance is offered on a dealer ace, costs half your bet, and pays 2:1.</li>
+      <li>Surrender on your first decision returns half the bet.</li>
+      <li>The dealer draws to 17 and stands on soft 17 unless the variant is enabled.</li>
+      <li>You act first, then the CPU seats play basic strategy, then the dealer draws.</li>
+    </ol>
   } @else {
     <h2>Poker Rules (Texas Hold'em)</h2>
     <ol>

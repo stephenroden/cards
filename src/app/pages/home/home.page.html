@@ -44,6 +44,22 @@
         <a class="primary" routerLink="/game/poker">Play Poker</a>
         <a class="ghost" routerLink="/rules/poker">Rules</a>
       </article>
+
+      <article class="game-tile blackjack-tile">
+        <h3>Blackjack</h3>
+        <p>Six-deck shoe, 3:2 naturals, double, split and surrender.</p>
+        <label class="rule-toggle">
+          <input
+            #soft17Toggle
+            type="checkbox"
+            [checked]="dealerHitsSoft17()"
+            (change)="setDealerHitsSoft17(soft17Toggle.checked)"
+          />
+          <span>Dealer hits soft 17</span>
+        </label>
+        <a class="primary" routerLink="/game/blackjack" (click)="prepareBlackjackGame()">Play Blackjack</a>
+        <a class="ghost" routerLink="/rules/blackjack">Rules</a>
+      </article>
     </div>
   </div>
 </section>

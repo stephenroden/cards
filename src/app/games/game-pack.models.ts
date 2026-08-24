@@ -1,6 +1,6 @@
-export const GAME_IDS = ['hearts', 'poker'] as const;
+export const GAME_IDS = ['hearts', 'poker', 'blackjack'] as const;
 
 export type GameId = (typeof GAME_IDS)[number];
 
 export const isGameId = (value: string | null | undefined): value is GameId =>
-  value === 'hearts' || value === 'poker';
+  GAME_IDS.includes(value as GameId);

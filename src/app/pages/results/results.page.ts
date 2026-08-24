@@ -5,6 +5,9 @@ import { scoreCard } from '../../game/services/scoring';
 import { GameEngineService } from '../../game/services/game-engine.service';
 import { GameStateService } from '../../game/services/game-state.service';
 import { GameId, isGameId } from '../../games/game-pack.models';
+import { BlackjackEngineService } from '../../blackjack/services/blackjack-engine.service';
+import { BlackjackStateService } from '../../blackjack/services/blackjack-state.service';
+import { describeHandValue } from '../../blackjack/services/blackjack-hand';
 import { evaluateBestHand } from '../../poker/services/poker-hand-evaluator';
 import { PokerEngineService } from '../../poker/services/poker-engine.service';
 import { PokerStateService } from '../../poker/services/poker-state.service';
@@ -21,6 +24,8 @@ export class ResultsPageComponent {
   private readonly gameEngine = inject(GameEngineService);
   private readonly gameState = inject(GameStateService);
   private readonly pokerEngine = inject(PokerEngineService);
+  private readonly blackjackEngine = inject(BlackjackEngineService);
+  private readonly blackjackState = inject(BlackjackStateService);
   private readonly pokerState = inject(PokerStateService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
@@ -31,7 +36,22 @@ export class ResultsPageComponent {
   });
 
   readonly heartsState = this.gameState.state;
+  readonly blackjack = this.blackjackState.state;
   readonly poker = this.pokerState.state;
+
+  readonly blackjackRows = computed(() =>
+    this.blackjack().seats.map((seat) => {
+      const insurance = seat.insuranceBet > 0 ? ` + ${seat.insuranceBet} insurance` : '';
+      const detail = seat.hands.length === 0
+        ? (seat.out ? 'Out of chips' : 'Sat out')
+        : seat.hands.map((hand) => describeHandValue(hand.cards)).join(' / ');
+      return {
+        seat,
+        detail: `${detail}${insurance}`,
+        bet: seat.hands.reduce((sum, hand) => sum + hand.bet, 0) + seat.insuranceBet
+      };
+    })
+  );
 
   readonly displayRound = computed(() => Math.max(1, this.heartsState().round - 1));
   readonly playersByScore = computed(() => [...this.heartsState().players].sort((left, right) => left.score - right.score));
@@ -98,6 +118,12 @@ export class ResultsPageComponent {
   );
 
   startNextRound(): void {
+    if (this.gameId() === 'blackjack') {
+      this.blackjackEngine.nextHand();
+      void this.router.navigate(['/game/blackjack']);
+      return;
+    }
+
     if (this.gameId() === 'poker') {
       this.pokerEngine.startNextHand();
       void this.router.navigate(['/game/poker']);
@@ -112,6 +138,12 @@ export class ResultsPageComponent {
   }
 
   startNewGame(): void {
+    if (this.gameId() === 'blackjack') {
+      this.blackjackEngine.startSession();
+      void this.router.navigate(['/game/blackjack']);
+      return;
+    }
+
     if (this.gameId() === 'poker') {
       this.pokerEngine.startSession();
       void this.router.navigate(['/game/poker']);
@@ -139,6 +171,10 @@ export class ResultsPageComponent {
 
   pokerNet(playerId: string): number {
     return this.poker().lastHandNet[playerId] ?? 0;
+  }
+
+  blackjackHandValue(cards: Card[]): string {
+    return describeHandValue(cards);
   }
 }
 

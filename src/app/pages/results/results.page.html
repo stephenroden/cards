@@ -20,6 +20,37 @@
         </div>
       }
     </div>
+  } @else if (gameId() === 'blackjack') {
+    <h2>Blackjack: Hand {{ blackjack().handNumber }}</h2>
+    <p>{{ blackjack().message }}</p>
+    <div class="scoreboard">
+      <div class="scoreboard-head">
+        <span>Seat</span>
+        <span class="num">Bet</span>
+        <span class="num">Net</span>
+        <span class="num">Chips</span>
+      </div>
+      <div class="score-row">
+        <span class="player-name">Dealer &mdash; {{ blackjackHandValue(blackjack().dealer) }}</span>
+        <span class="num">&mdash;</span>
+        <span class="num">&mdash;</span>
+        <span class="num">&mdash;</span>
+      </div>
+      @for (row of blackjackRows(); track row.seat.id) {
+        <div class="score-row">
+          <span class="player-name">{{ row.seat.name }} &mdash; {{ row.detail }}</span>
+          <span class="num">{{ row.bet > 0 ? row.bet : '—' }}</span>
+          <span
+            class="num"
+            [class.positive]="row.seat.lastNet > 0"
+            [class.negative]="row.seat.lastNet < 0"
+          >
+            {{ formatChipDelta(row.seat.lastNet) }}
+          </span>
+          <span class="num">{{ row.seat.bankroll }}</span>
+        </div>
+      }
+    </div>
   } @else {
     <h2>Poker Showdown</h2>
     @if (pokerWinnerName()) {
@@ -97,7 +128,7 @@
   }
 
   <div class="actions">
-    @if (gameId() === 'poker' || !gameStatus().isOver) {
+    @if (gameId() !== 'hearts' || !gameStatus().isOver) {
       <button class="primary" type="button" (click)="startNextRound()">
         {{ gameId() === 'hearts' ? 'Play Next Round' : 'Deal Next Hand' }}
       </button>

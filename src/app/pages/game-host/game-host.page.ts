@@ -2,12 +2,13 @@ import { Component, computed, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GamePageComponent } from '../game/game.page';
 import { PokerPageComponent } from '../poker/poker.page';
+import { BlackjackPageComponent } from '../blackjack/blackjack.page';
 import { isGameId } from '../../games/game-pack.models';
 
 @Component({
   selector: 'app-game-host-page',
   standalone: true,
-  imports: [GamePageComponent, PokerPageComponent],
+  imports: [GamePageComponent, PokerPageComponent, BlackjackPageComponent],
   templateUrl: './game-host.page.html'
 })
 export class GameHostPageComponent {
